@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const Approach = () => {
   return (
-    <section className="w-full py-20">
-      <h1 className="text-center md:tracking-wider mb-4 text-sm md:text-lg lg:text-2xl">
-        How the system works
+    <section id="approach" className="w-full py-20">
+      <h1 className="font-bold text-center md:tracking-wider mb-4 text-sm md:text-lg lg:text-2xl"> 
+        How the <span className="text-purple">system  </span> works
       </h1>
       {/* remove bg-white dark:bg-black */}
       <div className="my-20 flex flex-col lg:flex-row items-center justify-center w-full gap-4">

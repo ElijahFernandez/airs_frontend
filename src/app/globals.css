@@ -6,3 +6,7 @@
 body {
   @apply bg-midnight text-white;
 }
+
+html {
+  scroll-behavior: smooth;
+}
