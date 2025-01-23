@@ -8,12 +8,14 @@ const Navbar = () => {
     border border-black/[0.2] dark:border-white/[0.2] rounded-2xl max-w-4xl mx-auto mt-5">
       {/* Logo on the left */}
       <div className="flex items-center ml-5">
-        <Image
-          src="/logos/airs-w-bgr.png"   // Path relative to the "public" folder
-          alt="AIRS Logo"
-          width={100}              // Adjust width as needed
-          height={100}             // Adjust height as needed
-        />
+        <Link href="/">
+          <Image
+            src="/logos/airs-w-bgr.png"   // Path relative to the "public" folder
+            alt="AIRS Logo"
+            width={100}              // Adjust width as needed
+            height={100}             // Adjust height as needed
+          />
+        </Link>
       </div>
 
       {/* Navbar Links */}

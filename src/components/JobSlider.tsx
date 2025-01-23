@@ -1,8 +1,8 @@
-// components/JobSlider.tsx
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import { useState } from "react";
 import ChangeCustomJob from "@/components/ui/modals/ChangeCustomJob"; // Import the modal component
+import JobCard from "@/components/ui/modals/JobCard"; // Import the new JobCard modal
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -14,17 +14,22 @@ import { ServiceData } from "../constants";
 
 const JobSlider = () => {
   const [showModal, setShowModal] = useState(false); // Controls the modal visibility
-  const [newTitle, setNewTitle] = useState<string>(''); // Holds the new title for editing
-  const [currentItem, setCurrentItem] = useState<string>(''); // The item that is being edited
+  const [newTitle, setNewTitle] = useState<string>(""); // Holds the new title for editing
+  const [currentItem, setCurrentItem] = useState<string>(""); // The item that is being edited
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>(""); // The image of the item being edited
 
-  const handleClick = (title: string, index: number) => {
-    // Only show the modal for the last card
+  const handleClick = (title: string, imageUrl: string, index: number) => {
     if (index === ServiceData.length - 1) {
+      // Show ChangeCustomJob modal for the last card
       setCurrentItem(title);
+      setCurrentImageUrl(imageUrl);
       setNewTitle(title);
-      setShowModal(true); // Show the modal for editing
+      setShowModal(true); // Show the ChangeCustomJob modal
     } else {
-      alert(title); // Show the alert for other cards
+      // Show JobCard modal for other cards
+      setCurrentItem(title);
+      setCurrentImageUrl(imageUrl);
+      setShowModal(true); // Show the JobCard modal
     }
   };
 
@@ -53,10 +58,10 @@ const JobSlider = () => {
         {ServiceData.map((item, index) => (
           <SwiperSlide key={item.title}>
             <div
-              onClick={() => handleClick(item.title, index)} // Handle the click event and pass index
-              className="cursor-pointer" // Make the card clickable
+              onClick={() => handleClick(item.title, item.imageUrl.src, index)} // Pass both title and imageUrl
+              className="cursor-pointer"
             >
-              <div className="bg-[#1e3a5f] rounded-md shadow-md flex flex-col justify-between items-center h-[200px] p-4 relative">
+              <div className="bg-gradient-to-tl from-blue-950 from-5% via-indigo-700 via-30% to-blue-950 to-80% rounded-md shadow-md flex flex-col justify-between items-center h-[200px] p-4 relative">
                 {/* Centered Image */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Image
@@ -69,7 +74,7 @@ const JobSlider = () => {
                 </div>
                 {/* Title bar at the bottom */}
                 <div className="absolute bottom-0 w-full py-2">
-                  <h1 className="text-white text-center text-xs sm:text-sm font-medium">
+                  <h1 className="text-white text-center text-xs sm:text-xs font-small">
                     {item.title}
                   </h1>
                 </div>
@@ -79,14 +84,28 @@ const JobSlider = () => {
         ))}
       </Swiper>
 
-      {/* Modal for editing the title */}
-      <ChangeCustomJob
-        showModal={showModal}
-        newTitle={newTitle}
-        setNewTitle={setNewTitle}
-        handleSubmit={handleSubmit}
-        setShowModal={setShowModal}
-      />
+      {/* Modal for ChangeCustomJob (Last Card) */}
+      {showModal && currentItem && currentImageUrl && currentItem === ServiceData[ServiceData.length - 1].title ? (
+        <ChangeCustomJob
+          showModal={showModal}
+          newTitle={newTitle}
+          setNewTitle={setNewTitle}
+          handleSubmit={handleSubmit}
+          setShowModal={setShowModal}
+          currentItem={currentItem} // Pass the current title
+          imageUrl={currentImageUrl} // Pass the current image URL
+        />
+      ) : null}
+
+      {/* Modal for JobCard (Other Cards) */}
+      {showModal && currentItem && currentImageUrl && currentItem !== ServiceData[ServiceData.length - 1].title ? (
+        <JobCard
+          showModal={showModal}
+          setShowModal={setShowModal}
+          currentItem={currentItem} // Pass the current title
+          imageUrl={currentImageUrl} // Pass the current image URL
+        />
+      ) : null}
     </div>
   );
 };
