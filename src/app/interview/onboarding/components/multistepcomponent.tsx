@@ -1,13 +1,14 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
 
-const MultiStepComponent: React.FC = () => {
+// Define the prop types
+interface MultiStepComponentProps {
+  sessionId: string | null;
+}
+
+const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [checkboxStates, setCheckboxStates] = useState<boolean[]>(
-    Array(5).fill(false)
-  ); // For Step 2
+  const [checkboxStates, setCheckboxStates] = useState<boolean[]>(Array(5).fill(false)); // For Step 2
   const totalSteps = 3;
 
   const goToNextStep = () => {
@@ -52,8 +53,7 @@ const MultiStepComponent: React.FC = () => {
               Step 1: Enter Full Screen
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-              Full-screen mode ensures a smooth and focused experience—press F11
-              to turn it on and proceed.{" "}
+              Full-screen mode ensures a smooth and focused experience—press F11 to turn it on and proceed.
             </p>
             <Button
               onClick={() => {
@@ -92,9 +92,7 @@ const MultiStepComponent: React.FC = () => {
                     onChange={() => handleCheckboxChange(index)}
                     required
                   />
-                  <label className="text-gray-700 dark:text-gray-300">
-                    {statement}
-                  </label>
+                  <label className="text-gray-700 dark:text-gray-300">{statement}</label>
                 </div>
               ))}
               <div className="flex justify-between mt-6">
@@ -104,11 +102,7 @@ const MultiStepComponent: React.FC = () => {
                 <Button
                   onClick={goToNextStep}
                   disabled={!allCheckboxesChecked}
-                  className={
-                    !allCheckboxesChecked
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }
+                  className={!allCheckboxesChecked ? "opacity-50 pointer-events-none" : ""}
                 >
                   Proceed to Step 3
                 </Button>
@@ -121,8 +115,7 @@ const MultiStepComponent: React.FC = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Step 3: Placeholder</h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-              This is a placeholder for the next step. You can define its
-              functionality later.
+              This is a placeholder for the next step. You can define its functionality later.
             </p>
             <div className="flex justify-between mt-6">
               <Button variant="secondary" onClick={goToPreviousStep}>
@@ -131,7 +124,8 @@ const MultiStepComponent: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={() => {
-                  window.location.href = "/interview/jobs";
+                  // Redirect to /interview/jobs with sessionId as a query parameter
+                  window.location.href = `/interview/jobs?session=${sessionId}`;
                 }}
               >
                 Start the interview!

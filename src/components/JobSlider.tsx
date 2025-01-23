@@ -12,7 +12,12 @@ import { FreeMode, Pagination } from "swiper/modules";
 
 import { ServiceData } from "../constants";
 
-const JobSlider = () => {
+// Define the prop type for sessionId
+interface JobSliderProps {
+  sessionId: string | null; // Accept sessionId as a prop
+}
+
+const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
   const [showModal, setShowModal] = useState(false); // Controls the modal visibility
   const [newTitle, setNewTitle] = useState<string>(""); // Holds the new title for editing
   const [currentItem, setCurrentItem] = useState<string>(""); // The item that is being edited
@@ -94,6 +99,7 @@ const JobSlider = () => {
           setShowModal={setShowModal}
           currentItem={currentItem} // Pass the current title
           imageUrl={currentImageUrl} // Pass the current image URL
+          // sessionId={sessionId} // Pass the sessionId to the modal
         />
       ) : null}
 
@@ -104,6 +110,7 @@ const JobSlider = () => {
           setShowModal={setShowModal}
           currentItem={currentItem} // Pass the current title
           imageUrl={currentImageUrl} // Pass the current image URL
+          sessionId={sessionId} // Pass the sessionId to the modal
         />
       ) : null}
     </div>

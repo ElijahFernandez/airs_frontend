@@ -5,9 +5,10 @@ import { IoSend } from "react-icons/io5";
 
 interface ChatInterfaceProps {
   currentItem: string; // Accept currentItem as a prop
+  sessionId: string | null; // Accept sessionId as a prop
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId }) => {
   const [messages, setMessages] = useState<{ sender: "bot" | "user"; text: string }[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [currentEntity, setCurrentEntity] = useState<any | null>(null);
@@ -56,6 +57,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem }) => {
     setInputValue(""); // Clear the input field
 
     try {
+      // First check the response for tone/comprehensibility
+      const checkResponse = await fetch("http://127.0.0.1:5000/check-answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: currentEntity?.question,
+          response: inputValue,
+        }),
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (checkData.error) {
+        throw new Error(checkData.error);
+      }
+
+      // IMPLEMENT CHECK TONE AND COMPREHENSIBILITY
+
       const response = await fetch("http://127.0.0.1:5000/answer", {
         method: "POST",
         headers: {
@@ -68,6 +89,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem }) => {
       });
 
       const data = await response.json();
+
+      if (data.interview_data) {
+        navigateToNextPage(data.interview_data); // Pass sessionId to next page
+      }
 
       // Add the bot's next question to the chat
       if (data.question) {
@@ -102,6 +127,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem }) => {
     }
   };
 
+  function navigateToNextPage(interviewData: JSON) {
+    if (sessionId) {
+      // Send interview data and sessionId to the next page
+      window.location.href = `/review?session=${sessionId}`; // Example navigation to a review page with sessionId
+    } else {
+      window.location.href = "/review"; // Redirect without sessionId if not available
+    }
+  }
+
   return (
     <div className="relative flex flex-col w-full h-full border border-gray-300 rounded-lg bg-black">
       {/* Toast Notification */}
@@ -116,15 +150,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem }) => {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`mb-3 flex ${
-              msg.sender === "bot" ? "justify-start" : "justify-end"
-            }`}
+            className={`mb-3 flex ${msg.sender === "bot" ? "justify-start" : "justify-end"}`}
           >
             <div
               className={`inline-block p-3 rounded-lg max-w-[80%] break-words ${
-                msg.sender === "bot"
-                  ? "bg-gray-700 text-white"
-                  : "bg-blue-500 text-white"
+                msg.sender === "bot" ? "bg-gray-700 text-white" : "bg-blue-500 text-white"
               }`}
             >
               {msg.text}

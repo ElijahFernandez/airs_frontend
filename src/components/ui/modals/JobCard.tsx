@@ -5,6 +5,7 @@ interface JobCardProps {
   setShowModal: Dispatch<SetStateAction<boolean>>;
   currentItem: string;
   imageUrl: string;
+  sessionId: string | null; // Accept sessionId as a prop
 }
 
 const JobCard = ({
@@ -12,6 +13,7 @@ const JobCard = ({
   setShowModal,
   currentItem,
   imageUrl,
+  sessionId,
 }: JobCardProps) => {
   if (!showModal) return null; // Don't render anything if modal is not visible
 
@@ -38,7 +40,7 @@ const JobCard = ({
         {/* Buttons */}
         <div className="flex justify-center gap-2">
           <a
-            href={`/interview/chat?job=${encodeURIComponent(currentItem)}`} // Redirect with currentItem as query parameter
+            href={`/interview/chat?job=${encodeURIComponent(currentItem)}&session=${encodeURIComponent(sessionId || '')}`} // Redirect with both currentItem and sessionId as query parameters
             onClick={() => setShowModal(false)} // Close modal on navigation
             className="bg-blue-500 text-white px-8 py-3 rounded-full shadow-md text-center"
           >
