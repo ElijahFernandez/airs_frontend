@@ -2,7 +2,7 @@ import { FaLocationArrow } from "react-icons/fa6";
 import Image from "next/image";
 import MagicButton from "./ui/MagicButton";
 import { TextGenerateEffect } from "./ui/TextGenerateEffect";
-import GradientOverlay from "./ui/GradientOverlay";
+// import GradientOverlay from "./ui/GradientOverlay";
 
 const Hero = () => {
   return (
@@ -35,7 +35,7 @@ const Hero = () => {
             Start today and take the first step toward interview success!
           </p>
 
-          <a href="/interview/jobs">
+          <a href="/interview/onboarding">
             <MagicButton
               title="Get Started"
               icon={<FaLocationArrow />}

@@ -9,9 +9,7 @@ const Approach = () => {
       <h1 className="font-bold text-center md:tracking-wider mb-4 text-sm md:text-lg lg:text-2xl"> 
         How the <span className="text-purple">system  </span> works
       </h1>
-      {/* remove bg-white dark:bg-black */}
       <div className="my-20 flex flex-col lg:flex-row items-center justify-center w-full gap-4">
-        {/* add des prop */}
         <Card
           title="Discover your path"
           icon={<AceternityIcon order="Phase 1" />}
@@ -23,9 +21,6 @@ const Approach = () => {
           icon={<AceternityIcon order="Phase 2" />}
           des="Engage in a simulated interview with the chatbot. Answer a series of thoughtfully designed questions that assess your expertise, problem-solving skills, and communication abilities."
         >
-          {/* Radial gradient for the cute fade */}
-          {/* remove this one */}
-          {/* <div className="absolute inset-0 [mask-image:radial-gradient(400px_at_center,white,transparent)] bg-black/50 dark:bg-black/90" /> */}
         </Card>
         <Card
           title="Learn and improve"
