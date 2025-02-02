@@ -4,8 +4,8 @@ import Image from 'next/image';  // Import Image from next/image for optimized i
 
 const Navbar = () => {
   return (
-    <nav className="bg-midnlight text-white p-5 flex items-center justify-between z-50 relative 
-    border border-black/[0.2] dark:border-white/[0.2] rounded-2xl max-w-4xl mx-auto mt-5">
+    <nav className="bg-midlight text-white p-5 flex items-center justify-between relative
+    border border-black/[0.2] dark:border-white/[0.2]  mx-auto  w-full">
       {/* Logo on the left */}
       <div className="flex items-center ml-5">
         <Link href="/">
@@ -23,12 +23,12 @@ const Navbar = () => {
         <li>
           <Link href="#approach">about</Link>
         </li>
-        {/* <li>
+        <li>
           <Link href="/paper">paper</Link>
         </li>
         <li>
           <Link href="/policy">policy</Link>
-        </li> */}
+        </li>
       </ul>
     </nav>
   );

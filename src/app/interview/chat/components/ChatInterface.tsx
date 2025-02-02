@@ -11,7 +11,12 @@ interface ChatInterfaceProps {
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId }) => {
   const [messages, setMessages] = useState<{ sender: "bot" | "user"; text: string }[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [currentEntity, setCurrentEntity] = useState<any | null>(null);
+  interface Entity {
+    question: string;
+    // Add other properties of the entity here
+  }
+
+  const [currentEntity, setCurrentEntity] = useState<Entity | null>(null);
   const [isWaiting, setIsWaiting] = useState(false); // Track whether waiting for bot's response
   const [toastMessage, setToastMessage] = useState<string | null>(null); // Toast message
 
@@ -87,7 +92,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
           answer: inputValue,
         }),
       });
-
+      
       const data = await response.json();
 
       if (data.interview_data) {
@@ -127,14 +132,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
     }
   };
 
-  function navigateToNextPage(interviewData: JSON) {
-    if (sessionId) {
-      // Send interview data and sessionId to the next page
-      window.location.href = `/review?session=${sessionId}`; // Example navigation to a review page with sessionId
-    } else {
-      window.location.href = "/review"; // Redirect without sessionId if not available
+  function navigateToNextPage(interviewData: unknown) { // change to 'interview: any' if you know the type
+      if (sessionId) {
+        // Send interview data and sessionId to the next page
+        window.location.href = `/review?session=${sessionId}&data=${encodeURIComponent(JSON.stringify(interviewData))}`; // Example navigation to a review page with sessionId
+      } else {
+        window.location.href = `/review?data=${encodeURIComponent(JSON.stringify(interviewData))}`; // Redirect without sessionId if not available
+      }
     }
-  }
 
   return (
     <div className="relative flex flex-col w-full h-full border border-gray-300 rounded-lg bg-black">

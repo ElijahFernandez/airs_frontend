@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+// import Congrats from "./components/Congrats";
 
 interface InterviewEntry {
   question: string;
@@ -27,7 +28,7 @@ const Review = () => {
         const data = await response.json();
         setInterviewData(data.interview_data);
       } catch (err) {
-        setError("Failed to fetch data. Please try again.");
+        setError("Failed to fetch data. Please try again. (" + err + ")");
       }
     };
 
@@ -53,8 +54,10 @@ const Review = () => {
           ))}
         </div>
       ) : (
-        <p>Loading interview data...</p>
+      <p>Loading interview data...</p>
       )}
+
+      {/* <Congrats /> */}
     </div>
   );
 };

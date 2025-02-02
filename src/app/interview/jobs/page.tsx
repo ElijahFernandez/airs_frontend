@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Navbar from "@/components/navbar";
 import JobSlider from "@/components/JobSlider";
-import GradientOverlay from "@/components/ui/GradientOverlay";
+// import GradientOverlay from "@/components/ui/GradientOverlay";
 
 export default function Jobs() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -28,7 +27,7 @@ export default function Jobs() {
 
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
-      <GradientOverlay />
+      {/* <GradientOverlay /> */}
       <div className="text-center text-2xl md:text-3xl font-semibold mt-12 z-10 relative">
         Welcome to the Automated Interview Rating System!
       </div>

@@ -8,7 +8,7 @@ interface MultiStepComponentProps {
 
 const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [checkboxStates, setCheckboxStates] = useState<boolean[]>(Array(5).fill(false)); // For Step 2
+  const [checkboxStates, setCheckboxStates] = useState<boolean[]>(Array(2).fill(false)); // For Step 2
   const totalSteps = 3;
 
   const goToNextStep = () => {
@@ -81,9 +81,9 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
             <form className="text-left space-y-4">
               {[
                 "I acknowledge that my responses will be recorded and analyzed.",
-                "I understand my data will be handled securely.",
-                "I consent to the collection and storage of my data.",
-                "I may request access to or deletion of my data.",
+                // "I understand my data will be handled securely.",
+                // "I consent to the collection and storage of my data.",
+                // "I may request access to or deletion of my data.",
                 "I agree to the terms and conditions.",
               ].map((statement, index) => (
                 <div key={index} className="flex items-center">

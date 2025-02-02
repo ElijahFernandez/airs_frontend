@@ -4,7 +4,7 @@ import Image from "next/image"; // Import the Image component
 
 const Footer = () => {
   return (
-    <footer className="bg-midnlight text-white py-8 w-full">
+    <footer className="bg-midlight text-white py-8 w-full">
       <div className="max-w-5xl mx-auto px-4">
         {/* Top Section: Links */}
         <div className="flex flex-col md:flex-row justify-between items-center border-b border-gray-600 pb-6">

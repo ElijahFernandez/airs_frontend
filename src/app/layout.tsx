@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-// import { Geist, Geist_Mono } from "next/font/google";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./provider";
-
+import LayoutWrapper from "@/components/ui/LayoutWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "A.I.R. System",
-  description: "asjdnasd",
+  description: "Automated Interview Review System",
 };
 
 export default function RootLayout({
@@ -21,14 +20,15 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="airs-b-bgr.png" sizes="any" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-black-100`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          {/* Wrap content in LayoutWrapper */}
+          <LayoutWrapper>{children}</LayoutWrapper>
         </ThemeProvider>
       </body>
     </html>
