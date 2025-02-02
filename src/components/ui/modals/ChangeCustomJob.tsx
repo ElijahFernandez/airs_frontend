@@ -8,6 +8,7 @@ interface ChangeCustomJobProps {
   setShowModal: Dispatch<SetStateAction<boolean>>;
   currentItem: string;
   imageUrl: string;
+  sessionId: string | null; // Accept sessionId as a prop
 }
 
 const ChangeCustomJob = ({
@@ -18,6 +19,7 @@ const ChangeCustomJob = ({
   setShowModal,
   currentItem,
   imageUrl,
+  sessionId,
 }: ChangeCustomJobProps) => {
   if (!showModal) return null; // Don't render anything if modal is not visible
 
@@ -46,14 +48,15 @@ const ChangeCustomJob = ({
             placeholder="Enter the custom job title"
           />
           <div className="flex justify-center gap-2">
-            <button
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-8 py-3 rounded-full shadow-md"
+            <a
+              href={`/interview/chat?job=${encodeURIComponent(newTitle)}&session=${encodeURIComponent(sessionId || '')}`} // Redirect with newTitle and sessionId as query parameters
+              onClick={() => setShowModal(false)} // Close modal on navigation
+              className="bg-blue-500 text-white px-8 py-3 rounded-full shadow-md text-center"
             >
               Proceed
-            </button>
+            </a>
             <button
-              onClick={() => setShowModal(false)}
+              onClick={() => setShowModal(false)} // Close modal on Cancel button click
               className="border border-gray-500 text-gray-500 bg-transparent px-8 py-3 rounded-full shadow-md"
             >
               Cancel

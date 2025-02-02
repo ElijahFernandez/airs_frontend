@@ -58,7 +58,9 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
             <Button
               onClick={() => {
                 if (!document.fullscreenElement) {
-                  document.documentElement.requestFullscreen();
+                  document.documentElement.requestFullscreen().then(() => {
+                    localStorage.setItem("fullscreenEnabled", "true"); // Store fullscreen status
+                  });
                 }
                 goToNextStep();
               }}

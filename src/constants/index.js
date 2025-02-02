@@ -26,50 +26,62 @@ import Custom12 from '../../public/job-pictures/request.png';
 export const ServiceData = [
     {
         imageUrl: Laptop1,
-        title: "Junior Frontend Developer" 
+        title: "Junior Frontend Developer",
+        description: "Responsible for developing the user interface and ensuring a seamless user experience using HTML, CSS, JavaScript, and frameworks like React or Vue.js."
     },
     {
         imageUrl: Gear2,
-        title: "Junior Backend Developer" 
+        title: "Junior Backend Developer",
+        description: "Focuses on server-side logic, databases, and APIs, ensuring the functionality of web applications using languages like Node.js, Python, or Java."
     },
     {
         imageUrl: Phone3,
-        title: "Junior Mobile App Developer" 
+        title: "Junior Mobile App Developer",
+        description: "Develops mobile applications for Android and iOS platforms using technologies such as Flutter, React Native, or native development (Swift/Kotlin)."
     },
     {
         imageUrl: Game4,
-        title: "Junior Game Developer" 
+        title: "Junior Game Developer",
+        description: "Works on designing, coding, and testing game mechanics, using game engines like Unity or Unreal Engine, and programming languages such as C# or C++."
     },
     {
         imageUrl: Tube5,
-        title: "Junior Software QA Tester" 
+        title: "Junior Software QA Tester",
+        description: "Ensures software quality by performing manual and automated testing, writing test cases, and identifying bugs before deployment."
     },
     {
         imageUrl: Chart6,
-        title: "Junior Data Analyst" 
+        title: "Junior Data Analyst",
+        description: "Analyzes data to provide insights, creates reports, and visualizes trends using tools like SQL, Excel, Python, and Power BI."
     },
     {
         imageUrl: Microscope7,
-        title: "Entry-Level Data Scientist" 
+        title: "Entry-Level Data Scientist",
+        description: "Builds predictive models, analyzes large datasets, and applies machine learning techniques using Python, R, and data visualization tools."
     },
     {
         imageUrl: Lock8,
-        title: "Junior Cybersecurity Analyst" 
+        title: "Junior Cybersecurity Analyst",
+        description: "Monitors and secures networks, detects vulnerabilities, and responds to security threats to protect an organization’s digital assets."
     },
     {
         imageUrl: Unlock9,
-        title: "Entry-Level Penetration Tester" 
+        title: "Entry-Level Penetration Tester",
+        description: "Conducts ethical hacking to identify security weaknesses, tests network defenses, and provides recommendations for cybersecurity improvements."
     },
     {
         imageUrl: Computer10,
-        title: "Junior Systems Administrator" 
+        title: "Junior Systems Administrator",
+        description: "Manages IT infrastructure, configures servers, and ensures smooth operations of networks and systems within an organization."
     },
     {
         imageUrl: Palette11,
-        title: "Junior UI/UX Designer" 
+        title: "Junior UI/UX Designer",
+        description: "Designs user-friendly interfaces and enhances user experiences using tools like Figma, Adobe XD, and usability testing methodologies."
     },
     {
         imageUrl: Custom12,
-        title: "Custom Job" 
+        title: "Custom Job",
+        description: "Allows users to specify a custom job role that aligns with their career goals and skills."
     },
 ];

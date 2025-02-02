@@ -8,6 +8,15 @@ import GradientOverlay from "@/components/ui/GradientOverlay";
 export default function Jobs() {
   const [sessionId, setSessionId] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   // Check if fullscreen was enabled in onboarding
+  //   const wasFullscreen = localStorage.getItem("fullscreenEnabled") === "true";
+  
+  //   if (wasFullscreen && !document.fullscreenElement) {
+  //     document.documentElement.requestFullscreen();
+  //   }
+  // }, []);
+
   useEffect(() => {
     // Extract sessionId from the URL query parameters
     const params = new URLSearchParams(window.location.search);
@@ -19,11 +28,7 @@ export default function Jobs() {
 
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* GradientOverlay positioned to cover entire page */}
       <GradientOverlay />
-
-      {/* Main Content */}
-      <Navbar />
       <div className="text-center text-2xl md:text-3xl font-semibold mt-12 z-10 relative">
         Welcome to the Automated Interview Rating System!
       </div>
