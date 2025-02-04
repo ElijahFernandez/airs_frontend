@@ -1,4 +1,5 @@
-"use client";
+'use client'; 
+import React, { useState, useEffect, useRef } from "react";
 
 import React, { useState, useEffect } from "react";
 import Congrats from "./components/Congrats";
@@ -12,11 +13,16 @@ const scores = {
   Depth: 75,
   Professionalism: 80,
 };
-
+interface RatedDataEntry {
+  question: string;
+  answer: string;
+  score: { predicted_scores: number[][] };  // Array of arrays
+}
 interface InterviewEntry {
   theme: string;
   question: string;
   answer: string;
+  score: { predicted_scores: number[][] };  // Array of arrays
 }
 
 const mockInterviewData: InterviewEntry[] = [
@@ -52,13 +58,22 @@ const mockInterviewData: InterviewEntry[] = [
 ];
 
 const Review = () => {
+  const [ratedData, setRatedData] = useState<RatedDataEntry[] | null>(null);
   const [interviewData, setInterviewData] = useState<InterviewEntry[] | null>(
     null
   );
 
   const [error, setError] = useState<string | null>(null);
+  const fetchedRef = useRef(false); // Prevent multiple fetches
 
   useEffect(() => {
+    if (fetchedRef.current) return; // Prevent duplicate fetch calls
+    fetchedRef.current = true;
+
+    // Get the rated data from sessionStorage
+    const ratedDataString = sessionStorage.getItem('rated_data');  
+
+    if (ratedDataString) {
     //   const fetchInterviewData = async () => {
     //     try {
     //       const response = await fetch("http://localhost:5000/export-data", {
@@ -82,22 +97,29 @@ const Review = () => {
     // Simulate fetching data
     const fetchInterviewData = async () => {
       try {
+        const ratedDataParsed = JSON.parse(ratedDataString);
+
+        // Log the entire parsed data to understand its structure
+        console.log("Parsed rated data:", ratedDataParsed);
+        
+        // Check if 'processed_data' exists and is an array
+        if (ratedDataParsed.processed_data && Array.isArray(ratedDataParsed.processed_data)) {
+          setRatedData(ratedDataParsed.processed_data); // Set the array from 'processed_data'
+        } else {
+          setError("Rated data does not contain 'processed_data' or it's not an array.");
+        }
         // Simulating a delay to mimic fetching from an API
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Using mock data instead of actual API call
         setInterviewData(mockInterviewData);
       } catch (err) {
-        setError("Failed to fetch data. Please try again. (" + err + ")");
+        setError("Error parsing rated data.");
       }
-    };
-
-    fetchInterviewData();
+    } else {
+      setError("No rated data found.");
+    }
   }, []);
-
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
 
   return (
     <div className="max-w-4xl mx-auto p-4 flex-col items-center">
@@ -168,8 +190,9 @@ const Review = () => {
           )}
         </div>
       ) : (
-        <p>Loading interview data...</p>
+      <p>Loading interview data...</p>
       )}
+
       {/* <Congrats /> */}
     </div>
   );

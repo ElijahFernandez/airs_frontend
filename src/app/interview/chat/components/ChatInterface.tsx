@@ -60,10 +60,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
     setMessages((prev) => [...prev, { sender: "user", text: inputValue }]);
     setIsWaiting(true); // Set waiting state to true
     setInputValue(""); // Clear the input field
+    console.log("Before POST question: ", currentEntity?.question);
+    console.log("Before POST answer: ", inputValue);
 
     try {
       // First check the response for tone/comprehensibility
-      const checkResponse = await fetch("http://127.0.0.1:5000/check-answer", {
+      const checkResponse = await fetch("http://127.0.0.1:5000/check-answer", {        
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,8 +97,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
       
       const data = await response.json();
 
-      if (data.interview_data) {
-        navigateToNextPage(data.interview_data); // Pass sessionId to next page
+      if (data.interview_data && data.rated_data) {
+        console.log("Navigating with Data:", data);
+        console.log("Interview Data:", data.interview_data);
+        console.log("Rated Data:", data.rated_data);
+        navigateToNextPage(data.interview_data, data.rated_data);
       }
 
       // Add the bot's next question to the chat
@@ -105,8 +110,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
       }
 
       // Update the current entity with the new entity from the response
-      if (data.entity) {
-        setCurrentEntity(data.entity);
+      if (data.question) {
+        setCurrentEntity({ question: data.question });
       }
     } catch (error) {
       console.error("Error processing answer:", error);
@@ -132,14 +137,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
     }
   };
 
-  function navigateToNextPage(interviewData: unknown) { // change to 'interview: any' if you know the type
-      if (sessionId) {
-        // Send interview data and sessionId to the next page
-        window.location.href = `/review?session=${sessionId}&data=${encodeURIComponent(JSON.stringify(interviewData))}`; // Example navigation to a review page with sessionId
-      } else {
-        window.location.href = `/review?data=${encodeURIComponent(JSON.stringify(interviewData))}`; // Redirect without sessionId if not available
-      }
+  function navigateToNextPage(interviewData: unknown, ratedData: unknown) {
+    if (sessionId) {
+      // Store interview data, rated data, and sessionId in sessionStorage
+      // sessionStorage.setItem('interview_data', JSON.stringify(interviewData));
+      sessionStorage.setItem('rated_data', JSON.stringify(ratedData));
+      sessionStorage.setItem('session_id', sessionId); // Store sessionId if necessary
+      
+      // Navigate to the review page
+      window.location.href = `/review?session=${sessionId}`;
+    } else {
+      // Store only the interview data and rated data in sessionStorage if no sessionId
+      // sessionStorage.setItem('interview_data', JSON.stringify(interviewData));
+      sessionStorage.setItem('rated_data', JSON.stringify(ratedData));
+  
+      // Navigate to the review page
+      window.location.href = `/review`;
     }
+  }
+  
 
   return (
     <div className="relative flex flex-col w-full h-full border border-gray-300 rounded-lg bg-black">
