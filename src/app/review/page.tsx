@@ -1,118 +1,36 @@
-'use client'; 
+'use client';
 import React, { useState, useEffect, useRef } from "react";
-
-import React, { useState, useEffect } from "react";
 import Congrats from "./components/Congrats";
 import ProgressCircle from "./components/ProgressCircle";
-import QuestionAnswerBox from "./components/QuestionAnswerBox";
+import QuestionAnswerBox from "./components/QuestionAnswerBox"; // Import QuestionAnswerBox
 
-// placeholders for scores
-const scores = {
-  Relevance: 85,
-  Clarity: 90,
-  Depth: 75,
-  Professionalism: 80,
-};
 interface RatedDataEntry {
   question: string;
   answer: string;
-  score: { predicted_scores: number[][] };  // Array of arrays
+  score: { predicted_scores: number[][] }; // Array of arrays
 }
-interface InterviewEntry {
-  theme: string;
-  question: string;
-  answer: string;
-  score: { predicted_scores: number[][] };  // Array of arrays
-}
-
-const mockInterviewData: InterviewEntry[] = [
-  {
-    theme: "Self-Introduction",
-    question: "Tell me about yourself.",
-    answer:
-      "I am a computer science student passionate about AI and system administration.",
-  },
-  {
-    theme: "Learning and Adaptability",
-    question: "What are your strengths?",
-    answer: "I am highly adaptable and have strong problem-solving skills.",
-  },
-  {
-    theme: "Motivation and Goals",
-    question: "Where do you see yourself in 5 years?",
-    answer:
-      "I see myself as a system administrator, leading infrastructure projects.",
-  },
-  {
-    theme: "Motivation and Goals",
-    question: "Why do you want to work here?",
-    answer:
-      "I am impressed by your company's commitment to innovation and excellence.",
-  },
-  {
-    theme: "Teamwork and Collaboration",
-    question: "How do you handle stress and pressure?",
-    answer:
-      "I prioritize tasks, stay organized, and take breaks to maintain productivity.",
-  },
-];
 
 const Review = () => {
   const [ratedData, setRatedData] = useState<RatedDataEntry[] | null>(null);
-  const [interviewData, setInterviewData] = useState<InterviewEntry[] | null>(
-    null
-  );
-
   const [error, setError] = useState<string | null>(null);
-  const fetchedRef = useRef(false); // Prevent multiple fetches
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    if (fetchedRef.current) return; // Prevent duplicate fetch calls
+    if (fetchedRef.current) return;
     fetchedRef.current = true;
 
-    // Get the rated data from sessionStorage
-    const ratedDataString = sessionStorage.getItem('rated_data');  
+    const ratedDataString = sessionStorage.getItem("rated_data");
 
     if (ratedDataString) {
-    //   const fetchInterviewData = async () => {
-    //     try {
-    //       const response = await fetch("http://localhost:5000/export-data", {
-    //         method: "POST",
-    //       });
-
-    //       if (!response.ok) {
-    //         throw new Error("Failed to fetch interview data");
-    //       }
-
-    //       const data = await response.json();
-    //       setInterviewData(data.interview_data);
-    //     } catch (err) {
-    //       setError("Failed to fetch data. Please try again. (" + err + ")");
-    //     }
-    //   };
-
-    //   fetchInterviewData();
-    // }, []);
-
-    // Simulate fetching data
-    const fetchInterviewData = async () => {
       try {
         const ratedDataParsed = JSON.parse(ratedDataString);
-
-        // Log the entire parsed data to understand its structure
         console.log("Parsed rated data:", ratedDataParsed);
-        
-        // Check if 'processed_data' exists and is an array
+
         if (ratedDataParsed.processed_data && Array.isArray(ratedDataParsed.processed_data)) {
-          setRatedData(ratedDataParsed.processed_data); // Set the array from 'processed_data'
+          setRatedData(ratedDataParsed.processed_data);
         } else {
           setError("Rated data does not contain 'processed_data' or it's not an array.");
         }
-        // Simulating a delay to mimic fetching from an API
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Using mock data instead of actual API call
-        setInterviewData(mockInterviewData);
       } catch (err) {
         setError("Error parsing rated data.");
       }
@@ -121,79 +39,75 @@ const Review = () => {
     }
   }, []);
 
+  // Function to compute average scores in percentage
+const computeAverageScores = () => {
+  if (!ratedData || ratedData.length === 0) return [0, 0, 0, 0];
+
+  const scoreSums = [0, 0, 0, 0]; // Sum of scores for each category
+  const count = ratedData.length; // Number of entries
+
+  ratedData.forEach((entry) => {
+    entry.score.predicted_scores[0].forEach((score, idx) => {
+      scoreSums[idx] += score;
+    });
+  });
+
+  // Compute the averages and scale to percentage (assuming max score is 1.0)
+  return scoreSums.map((sum) => Math.round((sum / count) * 10)); // Convert to percentage
+};
+
+const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageScores();
+
+
   return (
-    <div className="max-w-4xl mx-auto p-4 flex-col items-center">
+    <div className="max-w-4xl mx-auto p-4 flex flex-col items-center">
       <Congrats />
       <h1 className="text-2xl font-semibold mb-4 text-center pb-5">
         Overall Scores:
       </h1>
-      <div className="flex flex-col items-center border-">
-        {/* Overall Scores in Progress Bar */}
-        <div className="flex gap-10 justify-center m-10">
-          {Object.entries(scores).map(([key, value]) => (
-            <div key={key} className="relative flex flex-col items-center">
-              <ProgressCircle
-                label={key}
-                value={value}
-                color={
-                  key === "Relevance"
-                    ? "#4CAF50"
-                    : key === "Clarity"
-                    ? "#2196F3"
-                    : key === "Depth"
-                    ? "#9C27B0"
-                    : key === "Professionalism"
-                    ? "#FF9800"
-                    : undefined
-                }
-                description={
-                  key === "Relevance"
-                    ? "Relevance measures how well the answer addresses the question."
-                    : key === "Clarity"
-                    ? "Clarity measures how well the answer is articulated and structured."
-                    : key === "Depth"
-                    ? "Depth measures the level of detail and insight in the answer."
-                    : key === "Professionalism"
-                    ? "Professionalism measures the overall demeanor and communication style."
-                    : undefined
-                }
-              />
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-4 mt-3 mx-auto mb-20">
-            <button className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
-            Save
-            </button>
-          <button className="px-4 py-2 border border-clarity  text-clarity rounded-lg hover:bg-clarity hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
-            Restart
-          </button>
-        </div>
+
+      <div className="flex gap-10 justify-center m-10">
+        <ProgressCircle label="Relevance" value={avgRelevance} color="#4CAF50" description="Measures how well the answer addresses the question." />
+        <ProgressCircle label="Clarity" value={avgClarity} color="#2196F3" description="Measures how well the answer is articulated." />
+        <ProgressCircle label="Depth" value={avgDepth} color="#9C27B0" description="Measures the level of detail in the answer." />
+        <ProgressCircle label="Professionalism" value={avgProfessionalism} color="#FF9800" description="Measures overall demeanor and communication style." />
       </div>
 
-      {interviewData ? (
-        <div className="space-y-10">
-          {interviewData.map(
-            (
-              item,
-              index // Modularized QuestionAnswerBox component
-            ) => (
-              <QuestionAnswerBox
-                theme={item.theme}
-                key={index}
-                question={item.question}
-                answer={item.answer}
-                index={index}
-                totalQuestions={interviewData.length}
-              />
-            )
-          )}
+
+      {/* Save and Restart Buttons */}
+      <div className="flex gap-4 mt-3 mx-auto mb-10">
+        <button className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
+          Save
+        </button>
+        <button className="px-4 py-2 border border-clarity text-clarity rounded-lg hover:bg-clarity hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
+          Restart
+        </button>
+      </div>
+
+      {/* Display Rated Data Using QuestionAnswerBox */}
+      {error && <p className="text-red-500">{error}</p>}
+
+      {ratedData ? (
+        <div className="flex flex-col items-center space-y-10 w-full">
+          {ratedData.map((entry, index) => (
+            <QuestionAnswerBox
+              key={index}
+              question={entry.question}
+              answer={entry.answer}
+              index={index}
+              totalQuestions={ratedData.length}
+              // scores={[
+              //   { label: "Relevance", value: entry.score.predicted_scores[0][0]?.toFixed(2) ?? "N/A" },
+              //   { label: "Clarity", value: entry.score.predicted_scores[0][1]?.toFixed(2) ?? "N/A" },
+              //   { label: "Depth", value: entry.score.predicted_scores[0][2]?.toFixed(2) ?? "N/A" },
+              //   { label: "Professionalism", value: entry.score.predicted_scores[0][3]?.toFixed(2) ?? "N/A" },
+              // ]}
+            />
+          ))}
         </div>
       ) : (
-      <p>Loading interview data...</p>
+        <p>Loading responses...</p>
       )}
-
-      {/* <Congrats /> */}
     </div>
   );
 };

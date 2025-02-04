@@ -9,6 +9,8 @@ import { TextGenerateEffect } from "./ui/TextGenerateEffect";
 const Hero = () => {
   const handleGetStarted = () => {
     // Generate a new UUID
+    sessionStorage.clear();
+    localStorage.clear();
     const sessionId = uuidv4();
     // Navigate to the onboarding page with the UUID in the query string
     window.location.href = `/interview/onboarding?session=${sessionId}`;

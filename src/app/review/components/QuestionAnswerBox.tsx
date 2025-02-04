@@ -1,7 +1,7 @@
 import React from "react";
 
 interface QuestionAnswerBoxProps {
-  theme: string; 
+  // theme: string; 
   question: string;
   answer: string;
   index: number;
@@ -9,7 +9,7 @@ interface QuestionAnswerBoxProps {
 }
 
 const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
-  theme,
+  // theme,
   question,
   answer,
   index,
@@ -21,9 +21,9 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
       {/* Question Box */}
       <div className="p-9 border border-black/[0.2] dark:border-white/[0.2] rounded-t-md bg-midlighter shadow-sm">
         <div className="pb-2 top-1 left-2 text-gray-500 text-xs flex gap-3">
-          <p className="text-xs pb-2" style={{ color: "#FFFFFF" }}>
+          {/* <p className="text-xs pb-2" style={{ color: "#FFFFFF" }}>
             {theme} 
-          </p>
+          </p> */}
           <p>
             |&nbsp;&nbsp;&nbsp;{index + 1} / {totalQuestions}  
           </p>
