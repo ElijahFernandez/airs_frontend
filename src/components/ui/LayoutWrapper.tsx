@@ -7,18 +7,22 @@ import Footer from "@/components/footer";
 const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
-  // Define routes that should NOT have Navbar/Footer
-  const hideLayoutOnRoutes = ["/interview/onboarding", "/interview/jobs", "/interview/chat"]; // add more routes to exclude navbar/footer/soon-to-be-created-layout-components
+  // Define routes that should NOT have a Navbar
+  const hideNavbarOnRoutes = ["/interview/onboarding", "/interview/jobs", "/interview/chat"];
 
-  const shouldHideLayout = hideLayoutOnRoutes.includes(pathname);
+  // Define routes that should NOT have a Footer
+  const hideFooterOnRoutes = ["/review"]; // Example: "/review" has Navbar but no Footer
+
+  const shouldHideNavbar = hideNavbarOnRoutes.some((route) => pathname.startsWith(route));
+  const shouldHideFooter = hideFooterOnRoutes.some((route) => pathname.startsWith(route));
 
   return (
     <div className="relative flex flex-col min-h-screen">
-      {!shouldHideLayout && <Navbar />}
-      <main className="flex-grow max-w-7xl mx-auto px-5 sm:px-10">
+      {!shouldHideNavbar && <Navbar />}
+      <main className="max-w-7xl mx-auto w-full">
         {children}
       </main>
-      {!shouldHideLayout && <Footer />}
+      {!shouldHideFooter && <Footer />}
     </div>
   );
 };
