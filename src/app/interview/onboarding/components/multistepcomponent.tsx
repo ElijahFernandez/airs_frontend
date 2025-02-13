@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
+import Link from "next/link";
 
 // Define the prop types
 interface MultiStepComponentProps {
@@ -94,7 +95,18 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
                     onChange={() => handleCheckboxChange(index)}
                     required
                   />
-                  <label className="text-gray-700 dark:text-gray-300">{statement}</label>
+                  <label className="text-gray-700 dark:text-gray-300">
+                    {index === 1 ? (
+                      <>
+                        I agree to the{" "}
+                        <Link href="/policy/return" className="text-blue-500 underline hover:text-blue-700">
+                          terms and conditions
+                        </Link>.
+                      </>
+                    ) : (
+                      statement
+                    )}
+                  </label>
                 </div>
               ))}
               <div className="flex justify-between mt-6">

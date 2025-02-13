@@ -22,7 +22,7 @@ const Footer = () => {
           {/* Footer Links */}
           <ul className="flex gap-6">
             <li>
-              <Link href="#approach" className="hover:text-gray-400">
+              <Link href="/about" className="hover:text-gray-400">
                 About
               </Link>
             </li>

@@ -21,13 +21,13 @@ const Navbar = () => {
       {/* Navbar Links */}
       <ul className="flex gap-20 mr-5">
         <li>
-          <Link href="#approach">about</Link>
+          <Link href="/about">About</Link>
         </li>
         <li>
-          <Link href="/paper">paper</Link>
+          <Link href="/paper">Paper</Link>
         </li>
         <li>
-          <Link href="/policy">policy</Link>
+          <Link href="/policy">Policy</Link>
         </li>
       </ul>
     </nav>
