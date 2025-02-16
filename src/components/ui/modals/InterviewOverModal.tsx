@@ -1,10 +1,21 @@
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; // Use Next.js navigation
 import Job from "../../../../public/job-done.jpg";
 
-const InterviewOverModal: React.FC = () => {
+interface InterviewOverModalProps {
+  sessionId: string | null;
+}
+
+const InterviewOverModal: React.FC<InterviewOverModalProps> = ({ sessionId }) => {
+  const router = useRouter();
+
   const handleRedirect = () => {
-    window.location.href = "/review";
+    if (sessionId) {
+      router.push(`/review?sessionId=${sessionId}`);
+    } else {
+      router.push("/review");
+    }
   };
 
   return (

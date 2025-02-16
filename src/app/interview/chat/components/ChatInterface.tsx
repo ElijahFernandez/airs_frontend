@@ -130,7 +130,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
       </div>
 
       {/* Interview Over Modal */}
-      {showModal && <InterviewOverModal />}
+      {showModal && <InterviewOverModal sessionId={sessionId} />}
+
     </div>
   );
 };
