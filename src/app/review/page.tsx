@@ -32,7 +32,7 @@ const Review = () => {
           setError("Rated data does not contain 'processed_data' or it's not an array.");
         }
       } catch (err) {
-        setError("Error parsing rated data.");
+        setError("Error parsing rated data. (" + err + ")");
       }
     } else {
       setError("No rated data found.");
@@ -66,7 +66,7 @@ const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageS
         Overall Scores:
       </h1>
 
-      <div className="flex gap-10 justify-center m-10">
+      <div className="flex relative gap-10 justify-center m-10 pb-5">
         <ProgressCircle label="Relevance" value={avgRelevance} color="#4CAF50" description="Measures how well the answer addresses the question." />
         <ProgressCircle label="Clarity" value={avgClarity} color="#2196F3" description="Measures how well the answer is articulated." />
         <ProgressCircle label="Depth" value={avgDepth} color="#9C27B0" description="Measures the level of detail in the answer." />
@@ -75,7 +75,7 @@ const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageS
 
 
       {/* Save and Restart Buttons */}
-      <div className="flex gap-4 mt-3 mx-auto mb-10">
+      <div className="flex gap-4 mx-auto mb-10">
         <button className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
           Save
         </button>
@@ -95,13 +95,8 @@ const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageS
               question={entry.question}
               answer={entry.answer}
               index={index}
-              totalQuestions={ratedData.length}
-              // scores={[
-              //   { label: "Relevance", value: entry.score.predicted_scores[0][0]?.toFixed(2) ?? "N/A" },
-              //   { label: "Clarity", value: entry.score.predicted_scores[0][1]?.toFixed(2) ?? "N/A" },
-              //   { label: "Depth", value: entry.score.predicted_scores[0][2]?.toFixed(2) ?? "N/A" },
-              //   { label: "Professionalism", value: entry.score.predicted_scores[0][3]?.toFixed(2) ?? "N/A" },
-              // ]}
+              totalQuestions={ratedData.length} 
+              scores={entry.score.predicted_scores[0]} 
             />
           ))}
         </div>
