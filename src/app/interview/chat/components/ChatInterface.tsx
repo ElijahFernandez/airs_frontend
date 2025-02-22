@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { IoSend } from "react-icons/io5";
 import InterviewOverModal from "../../../../components/ui/modals/InterviewOverModal"; // Import the modal
 
@@ -14,6 +14,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
   const [inputValue, setInputValue] = useState("");
   const [isWaiting, setIsWaiting] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal visibility state
+  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref for auto-scroll
 
   interface Entity {
     question: string;
@@ -84,6 +85,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
     }
   }, [currentItem]);
 
+  // Scroll to the bottom of the chat area, not the entire page
+  useEffect(() => {
+    const chatContainer = messagesEndRef.current?.parentElement;
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  }, [messages]);
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       sendMessage();
@@ -93,7 +102,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
   return (
     <div className="relative flex flex-col w-full h-full border border-gray-300 rounded-lg bg-black">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-4 h-[60vh]">
         {messages.map((msg, index) => (
           <div key={index} className={`mb-3 flex ${msg.sender === "bot" ? "justify-start" : "justify-end"}`}>
             <div
@@ -105,6 +114,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} /> {/* Empty div for scrolling */}
       </div>
 
       {/* Input Area */}
@@ -131,7 +141,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId })
 
       {/* Interview Over Modal */}
       {showModal && <InterviewOverModal sessionId={sessionId} />}
-
     </div>
   );
 };
