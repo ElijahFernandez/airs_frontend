@@ -43,7 +43,7 @@ const Review = () => {
           setError("Rated data does not contain 'processed_data' or it's not an array.");
         }
       } catch (err) {
-        setError("Error parsing rated data.");
+        setError("Error parsing rated data. (" + err + ")");
       }
     } else {
       setError("No rated data found.");
@@ -132,7 +132,7 @@ const Review = () => {
       <Congrats />
       <h1 className="text-2xl font-semibold mb-4 text-center pb-5">Overall Scores:</h1>
 
-      <div className="flex gap-10 justify-center m-10">
+      <div className="flex relative gap-10 justify-center m-10 pb-5">
         <ProgressCircle label="Relevance" value={avgRelevance} color="#4CAF50" description="Measures how well the answer addresses the question." />
         <ProgressCircle label="Clarity" value={avgClarity} color="#2196F3" description="Measures how well the answer is articulated." />
         <ProgressCircle label="Depth" value={avgDepth} color="#9C27B0" description="Measures the level of detail in the answer." />
@@ -158,7 +158,14 @@ const Review = () => {
       {ratedData ? (
         <div className="flex flex-col items-center space-y-10 w-full">
           {ratedData.map((entry, index) => (
-            <QuestionAnswerBox key={index} question={entry.question} answer={entry.answer} index={index} totalQuestions={ratedData.length} />
+            <QuestionAnswerBox
+              key={index}
+              question={entry.question}
+              answer={entry.answer}
+              index={index}
+              totalQuestions={ratedData.length} 
+              scores={entry.score.predicted_scores[0]} 
+            />
           ))}
         </div>
       ) : (
