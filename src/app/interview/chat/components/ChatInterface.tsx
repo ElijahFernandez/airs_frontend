@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { IoSend } from "react-icons/io5";
-import { Timer } from "lucide-react";
+// import { Timer } from "lucide-react";
 import InterviewOverModal from "../../../../components/ui/modals/InterviewOverModal";
 
 interface ChatInterfaceProps {
@@ -36,32 +36,32 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  // Function to check remaining time
-  const checkRemainingTime = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:5000/check-time");
-      const data = await response.json();
+  // // Function to check remaining time
+  // const checkRemainingTime = async () => {
+  //   try {
+  //     const response = await fetch("http://127.0.0.1:5000/check-time");
+  //     const data = await response.json();
 
-      if (data.remaining_time !== undefined) {
-        setRemainingTime(data.remaining_time);
+  //     if (data.remaining_time !== undefined) {
+  //       setRemainingTime(data.remaining_time);
 
-        // If interview is over, show modal
-        if (data.end_interview) {
-          setShowModal(true);
-        }
-      }
-    } catch (error) {
-      console.error("Error checking time:", error);
-    }
-  };
+  //       // If interview is over, show modal
+  //       if (data.end_interview) {
+  //         setShowModal(true);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error checking time:", error);
+  //   }
+  // };
 
-  // Start polling for time when interview starts
-  useEffect(() => {
-    if (currentItem) {
-      const timeInterval = setInterval(checkRemainingTime, 1000);
-      return () => clearInterval(timeInterval);
-    }
-  }, [currentItem]);
+  // // Start polling for time when interview starts
+  // useEffect(() => {
+  //   if (currentItem) {
+  //     const timeInterval = setInterval(checkRemainingTime, 1000);
+  //     return () => clearInterval(timeInterval);
+  //   }
+  // }, [currentItem]);
 
   const startInterview = async () => {
     try {
@@ -164,12 +164,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="flex flex-col w-full h-full">
       {/* Timer Display */}
-      <div className="bg-gray-800 p-3 rounded-t-lg flex items-center justify-center gap-2 border-b border-gray-700">
+      {/* <div className="bg-gray-800 p-3 rounded-t-lg flex items-center justify-center gap-2 border-b border-gray-700">
         <Timer className="text-white" size={20} />
         <span className="text-white font-mono text-lg">
           {remainingTime !== null ? formatTime(remainingTime) : "Loading..."}
         </span>
-      </div>
+      </div> */}
 
       {/* Chat Container */}
       <div className="relative flex flex-col flex-1 border border-gray-300 rounded-b-lg bg-black">

@@ -24,18 +24,18 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
     }
   };
 
-  const handleFullscreenChange = () => {
-    if (!document.fullscreenElement) {
-      setCurrentStep(1);
-    }
-  };
+  // const handleFullscreenChange = () => {
+  //   if (!document.fullscreenElement) {
+  //     setCurrentStep(1);
+  //   }
+  // };
 
-  useEffect(() => {
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener("fullscreenchange", handleFullscreenChange);
+  //   return () => {
+  //     document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  //   };
+  // }, []);
 
   const handleCheckboxChange = (index: number) => {
     const updatedStates = [...checkboxStates];
@@ -51,18 +51,13 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
         return (
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">
-              Step 1: Enter Full Screen
+              Step 1: Ensure Internet Stability
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-              Full-screen mode ensures a smooth and focused experience—press F11 to turn it on and proceed.
+            Before we begin, check that you have a stable internet connection.
             </p>
             <Button
               onClick={() => {
-                if (!document.fullscreenElement) {
-                  document.documentElement.requestFullscreen().then(() => {
-                    localStorage.setItem("fullscreenEnabled", "true"); // Store fullscreen status
-                  });
-                }
                 goToNextStep();
               }}
             >
@@ -127,9 +122,9 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
       case 3:
         return (
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Step 3: Placeholder</h1>
+            <h1 className="text-2xl font-bold mb-4">Step 3: Start the Interview</h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-              This is a placeholder for the next step. You can define its functionality later.
+            On the next page, use the slider to pick a job that fits your skills and interests. 
             </p>
             <div className="flex justify-between mt-6">
               <Button variant="secondary" onClick={goToPreviousStep}>
@@ -142,7 +137,7 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
                   window.location.href = `/interview/jobs?session=${sessionId}`;
                 }}
               >
-                Start the interview!
+                Proceed
               </Button>
             </div>
           </div>

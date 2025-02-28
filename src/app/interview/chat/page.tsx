@@ -4,26 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ChatInterface from "@/app/interview/chat/components/ChatInterface";
 import GradientOverlay from "@/components/ui/GradientOverlay";
-import ExitConfirmationModal from "./../../../components/ui/modals/ExitConfirmationModal";
+import ExitConfirmationModal from "@/components/ui/modals/ExitConfirmationModal";
+import FullscreenPromptModal from "@/components/ui/modals/FullscreenPromptModal"; 
+import { AiOutlineHome } from "react-icons/ai"; // Import the Home icon
 
 export default function Chat() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showFullscreenModal, setShowFullscreenModal] = useState(true); // Show modal on render
 
-  // Extract query parameters
   const currentItem = searchParams.get("job") || "defaultItem";
   const sessionId = searchParams.get("session") || null;
 
   useEffect(() => {
-    // Block back navigation
     const handleBackNavigation = (event: PopStateEvent) => {
       event.preventDefault();
       setShowExitModal(true);
       window.history.pushState(null, "", window.location.href);
     };
 
-    // Disable F5, Ctrl+R, and context menu
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
         event.preventDefault();
@@ -47,27 +47,92 @@ export default function Chat() {
   }, []);
 
   const handleExit = () => {
-    router.push("/"); // Redirect to home
+    if (document.fullscreenElement) {
+      document.exitFullscreen().then(() => {
+        console.log("Exited fullscreen mode before redirecting");
+        router.push("/");
+      }).catch(err => {
+        console.error("Error exiting fullscreen:", err);
+        router.push("/"); // Redirect even if exiting fullscreen fails
+      });
+    } else {
+      router.push("/");
+    }
   };
 
-  const handleStay = () => {
-    setShowExitModal(false);
+  const handleFullscreenChange = () => {
+    if (document.fullscreenElement) {
+      console.log("Entered fullscreen mode");
+      setShowFullscreenModal(false); // Close modal only if fullscreen is active
+    } else {
+      setShowExitModal(true);
+      console.log("Exited fullscreen mode");
+    }
   };
+
+  const handleCancelExit = () => {
+    setShowExitModal(false); // Close modal
+
+    // Only re-enter fullscreen if still on the Chat page
+    if (window.location.pathname === "/interview/chat") {
+      enableFullscreen();
+    }
+  };
+  
+  useEffect(() => {
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+  
+  const enableFullscreen = () => {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().then(() => {
+        console.log("Fullscreen request successful");
+      }).catch(err => {
+        console.error("Fullscreen error:", err);
+      });
+    }
+  };  
 
   return (
     <div className="min-h-screen flex flex-col">
       <GradientOverlay />
+      {/* Home Icon Button */}
+      <div>
+        <button
+          className="fixed top-6 left-6 p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 shadow"
+          onClick={() => {
+            setShowExitModal(true);
+          }}
+        >
+          <AiOutlineHome className="text-3xl text-gray-800 dark:text-gray-200"/>
+        </button>  
+      </div> 
+
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-[80vw] h-[70vh] overflow-hidden">
           <ChatInterface currentItem={currentItem} sessionId={sessionId} />
         </div>
       </div>
 
+      {/* Fullscreen Modal */}
+      {showFullscreenModal && (
+        <FullscreenPromptModal
+          showModal={showFullscreenModal}
+          setShowModal={setShowFullscreenModal}
+          handleConfirm={enableFullscreen}
+        />
+      )}
+
+      {/* Exit Confirmation Modal */}
       {showExitModal && (
         <ExitConfirmationModal
           showModal={showExitModal}
           setShowModal={setShowExitModal}
           handleConfirmExit={handleExit}
+          handleCancel={handleCancelExit}
         />
       )}
     </div>

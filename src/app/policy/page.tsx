@@ -63,7 +63,7 @@ export default function TermsPage() {
   
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">7. Contact Us</h2>
-          <p>If you have any questions about these Terms, please contact us at <a href="mailto:support.airs@gmail.com" className="text-blue-600">support.airs@gmail.com</a>.</p>
+          <p>If you have any questions about these Terms, please contact us at <a href="mailto:airs.reports@gmail.com" className="text-blue-600">airs.reports@gmail.com</a>.</p>
         </section>
       </div>
     );
