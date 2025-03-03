@@ -1,5 +1,6 @@
 "use client";
-import { useEffect } from "react";
+
+import { useMemo, useLayoutEffect } from "react";
 import { motion, stagger, useAnimate } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -11,46 +12,43 @@ export const TextGenerateEffect = ({
   className?: string;
 }) => {
   const [scope, animate] = useAnimate();
-  const wordsArray = words.split(" ");
-  useEffect(() => {
-    console.log(wordsArray);
-    animate(
-      "span",
-      {
-        opacity: 1,
-      },
-      {
-        duration: 2,
-        delay: stagger(0.2),
-      }
-    );
-  }, [animate, wordsArray]);
+  const wordsArray = useMemo(() => words.split(" "), [words]);
+
+  useLayoutEffect(() => {
+    if (!scope.current) return;
+    
+    const startAnimation = async () => {
+      await animate(
+        ".animate-word",
+        { opacity: 1 },
+        { duration: 2, delay: stagger(0.2) }
+      );
+    };
+
+    startAnimation();
+  }, [animate, scope, wordsArray]);
 
   const renderWords = () => {
     return (
       <motion.div ref={scope}>
-        {wordsArray.map((word, idx) => {
-          return (
-            <motion.span
-              key={word + idx}
-              // change here if idx is greater than 3, change the text color to #CBACF9
-              className={` ${idx > 4 ? "text-purple" : "dark:text-white text-black"
-                } opacity-0`}
-            >
-              {word}{" "}
-            </motion.span>
-          );
-        })}
+        {wordsArray.map((word, idx) => (
+          <motion.span
+            key={word + idx}
+            className={`animate-word ${
+              idx > 4 ? "text-purple" : "dark:text-white text-black"
+            } opacity-0`}
+          >
+            {word}{" "}
+          </motion.span>
+        ))}
       </motion.div>
     );
   };
 
   return (
     <div className={cn("font-bold", className)}>
-      {/* mt-4 to my-4 */}
       <div className="my-4">
-        {/* remove  text-2xl from the original */}
-        <div className=" dark:text-white text-black leading-snug tracking-wide">
+        <div className="dark:text-white text-black leading-snug tracking-wide">
           {renderWords()}
         </div>
       </div>

@@ -11,6 +11,18 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Hide caret for all elements except inputs and contenteditables */
+* {
+  caret-color: transparent;
+}
+
+/* Restore caret for actual input elements */
+input,
+textarea,
+[contenteditable] {
+  caret-color: auto;
+}
+
 .typing {
   width: 5em;
   height: 2em;

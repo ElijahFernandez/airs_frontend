@@ -13,7 +13,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   label,
   value,
   color,
-  description
+  description,
 }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -27,7 +27,11 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   }, [value]);
 
   return (
-    <div className="w-28 text-center">
+    <div
+      className="w-28 text-center relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <CircularProgressbar
         value={animatedValue}
         text={`${animatedValue}%`}
@@ -45,18 +49,12 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
       <p
         className="mt-1 text-sm text-center pt-2 cursor-pointer"
         style={{ color }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
-        {" "}
         {label}
       </p>
       {/* Tooltip box */}
-      {isHovered && (
-        <div
-          className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg transition-opacity "
-          style={{ opacity: isHovered ? 1 : 0 }}
-        >
+      {isHovered && description && (
+        <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg z-10">
           {description}
         </div>
       )}

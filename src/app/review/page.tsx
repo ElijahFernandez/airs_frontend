@@ -1,12 +1,13 @@
-'use client';
-import React, { useState, useEffect, useRef } from "react";
+"use client";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Congrats from "./components/Congrats";
 import ProgressCircle from "./components/ProgressCircle";
 import QuestionAnswerBox from "./components/QuestionAnswerBox";
 import SaveConfirmationModal from "./../../components/ui/modals/SaveConfirmationModal";
 import LoadingModal from "./../../components/ui/modals/LoadingModal";
-import ExitConfirmationModal from "./../../components/ui/modals/ExitConfirmationModal"; // Import Exit Modal
-import { useSearchParams, useRouter } from "next/navigation";
+import ExitConfirmationModal from "./../../components/ui/modals/ExitConfirmationModal";
+import { useRouter } from "next/navigation";
+import SearchParamsHandler from "./components/SearchParamsHandler";
 
 interface RatedDataEntry {
   question: string;
@@ -14,19 +15,16 @@ interface RatedDataEntry {
   score: { predicted_scores: number[][] };
 }
 
-const Review = () => {
+const Review = ({ sessionId }: { sessionId: string | null }) => {
   const [ratedData, setRatedData] = useState<RatedDataEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [savePayload, setSavePayload] = useState<unknown>(null);
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get("sessionId");
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
-  const [showExitModal, setShowExitModal] = useState(false); // State for Exit Modal
-
-  const router = useRouter(); // Next.js router
+  const [showExitModal, setShowExitModal] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -120,7 +118,6 @@ const Review = () => {
       setShowExitModal(true); // Show confirmation modal if email is NOT sent
     }
   };
-  
 
   const handleConfirmExit = () => {
     sessionStorage.removeItem("rated_data"); // Clear session storage
@@ -177,4 +174,12 @@ const Review = () => {
   );
 };
 
-export default Review;
+export default function ReviewPage() {
+  return (
+    <Suspense fallback={<div>Loading review...</div>}>
+      <SearchParamsHandler>
+        {({ sessionId }) => <Review sessionId={sessionId} />}
+      </SearchParamsHandler>
+    </Suspense>
+  );
+}

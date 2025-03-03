@@ -164,7 +164,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex w-full h-full">
       {/* Timer Display */}
       {/* <div className="bg-gray-800 p-3 rounded-t-lg flex items-center justify-center gap-2 border-b border-gray-700">
         <Timer className="text-white" size={20} />
@@ -176,7 +176,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {/* Chat Container */}
       <div className="relative flex flex-col flex-1 border border-gray-300 rounded-b-lg bg-black">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 max-h-[500px]">
+        <div className="flex-1 overflow-y-auto p-4 max-h-[800px]">
           {messages.map((msg, index) => (
             <div
               key={index}
