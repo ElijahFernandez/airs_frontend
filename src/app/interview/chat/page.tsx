@@ -1,21 +1,22 @@
 "use client";
-
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import ChatInterface from "@/app/interview/chat/components/ChatInterface";
 import GradientOverlay from "@/components/ui/GradientOverlay";
 import ExitConfirmationModal from "@/components/ui/modals/ExitConfirmationModal";
-import FullscreenPromptModal from "@/components/ui/modals/FullscreenPromptModal"; 
+import FullscreenPromptModal from "@/components/ui/modals/FullscreenPromptModal";
 import { AiOutlineHome } from "react-icons/ai"; // Import the Home icon
+import SearchParamsHandler from "./components/SearchParamsHandler";
 
 export default function Chat() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const [showExitModal, setShowExitModal] = useState(false);
   const [showFullscreenModal, setShowFullscreenModal] = useState(true); // Show modal on render
 
-  const currentItem = searchParams.get("job") || "defaultItem";
-  const sessionId = searchParams.get("session") || null;
+  // const currentItem = searchParams.get("job") || "defaultItem";
+  // const sessionId = searchParams.get("session") || null;
 
   useEffect(() => {
     const handleBackNavigation = (event: PopStateEvent) => {
@@ -48,13 +49,16 @@ export default function Chat() {
 
   const handleExit = () => {
     if (document.fullscreenElement) {
-      document.exitFullscreen().then(() => {
-        console.log("Exited fullscreen mode before redirecting");
-        router.push("/");
-      }).catch(err => {
-        console.error("Error exiting fullscreen:", err);
-        router.push("/"); // Redirect even if exiting fullscreen fails
-      });
+      document
+        .exitFullscreen()
+        .then(() => {
+          console.log("Exited fullscreen mode before redirecting");
+          router.push("/");
+        })
+        .catch((err) => {
+          console.error("Error exiting fullscreen:", err);
+          router.push("/"); // Redirect even if exiting fullscreen fails
+        });
     } else {
       router.push("/");
     }
@@ -78,23 +82,26 @@ export default function Chat() {
       enableFullscreen();
     }
   };
-  
+
   useEffect(() => {
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, []);
-  
+
   const enableFullscreen = () => {
     if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().then(() => {
-        console.log("Fullscreen request successful");
-      }).catch(err => {
-        console.error("Fullscreen error:", err);
-      });
+      document.documentElement
+        .requestFullscreen()
+        .then(() => {
+          console.log("Fullscreen request successful");
+        })
+        .catch((err) => {
+          console.error("Fullscreen error:", err);
+        });
     }
-  };  
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -107,13 +114,19 @@ export default function Chat() {
             setShowExitModal(true);
           }}
         >
-          <AiOutlineHome className="text-3xl text-gray-800 dark:text-gray-200"/>
-        </button>  
-      </div> 
+          <AiOutlineHome className="text-3xl text-gray-800 dark:text-gray-200" />
+        </button>
+      </div>
 
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-[80vw] h-[70vh] overflow-hidden">
-          <ChatInterface currentItem={currentItem} sessionId={sessionId} />
+          <Suspense fallback={<div>Loading chat...</div>}>
+            <SearchParamsHandler>
+              {({ job, session }) => (
+                <ChatInterface currentItem={job} sessionId={session} />
+              )}
+            </SearchParamsHandler>
+          </Suspense>
         </div>
       </div>
 
