@@ -12,8 +12,8 @@ export default function TermsPage() {
 
       <section className="mb-8">
         <p>
-          Welcome to Automated Interview Rating System (AIRS) ("we," "our," or "us"). These Terms and Conditions ("Terms")
-          govern your access to and use of our AI-powered interview rating system ("Service"). By using our Service,
+          Welcome to Automated Interview Rating System (AIRS) (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). These Terms and Conditions (&quot;Terms&quot;)
+          govern your access to and use of our AI-powered interview rating system (&quot;Service&quot;). By using our Service,
           you agree to comply with these Terms. If you do not agree, please do not use our Service.
         </p>
       </section>
@@ -47,7 +47,7 @@ export default function TermsPage() {
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-4">4. Liability & Disclaimers</h2>
         <ul className="list-disc pl-6 space-y-2">
-          <li>The Service is provided "as is" without warranties of any kind.</li>
+          <li>The Service is provided &quot;as is&quot; without warranties of any kind.</li>
           <li>We are not responsible for decisions made based on AI-generated feedback.</li>
           <li>We are not liable for technical issues, data loss, or damages resulting from Service use.</li>
           <li>AI responses may be inaccurate or misleading. AIRS is not responsible for chatbot output.</li>

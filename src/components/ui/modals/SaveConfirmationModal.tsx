@@ -5,7 +5,7 @@ import Image from "next/image";
 interface SaveConfirmationModalProps {
   showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
-  payload: any;
+  payload: unknown;
   handleConfirmSave: (email: string) => void;
 }
 
@@ -15,9 +15,9 @@ const SaveConfirmationModal = ({
   payload,
   handleConfirmSave,
 }: SaveConfirmationModalProps) => {
-  if (!showModal) return null;
-
   const [email, setEmail] = useState("");
+
+  if (!showModal) return null;
 
   console.log(payload);
 

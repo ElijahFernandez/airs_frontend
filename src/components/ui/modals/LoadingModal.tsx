@@ -16,7 +16,7 @@ const LoadingModal = ({ show }: LoadingModalProps) => {
           This might take a minute or two. Please wait.
         </p>
         <p className="text-gray-500 text-xs text-center">
-          If a printer alert appears, don't cancel—it's just the PDF generating..
+          If a printer alert appears, don&apos;t cancel—it&apos;s just the PDF generating..
         </p>
       </div>
     </div>

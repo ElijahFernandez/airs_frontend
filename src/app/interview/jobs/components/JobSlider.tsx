@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import { useState } from "react";
 import ChangeCustomJob from "@/components/ui/modals/ChangeCustomJob";
-import JobCard from "@/components/ui/modals/JobCard";
+import JobCard from "@/app/interview/jobs/components/JobCard";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -10,10 +10,11 @@ import "swiper/css/free-mode";
 
 import { FreeMode, Pagination } from "swiper/modules";
 
-import { ServiceData } from "../constants";
+import { ServiceData } from "../../../../constants";
 
 interface JobSliderProps {
   sessionId: string | null;
+  chosenJob: string;
 }
 
 const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
@@ -36,28 +37,23 @@ const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
   };
 
   const handleSubmit = () => {
+    console.log(`Updated title: ${newTitle}`);
     alert(`Updated title: ${newTitle}`);
     setShowModal(false);
   };
 
   return (
-    <div className="relative h-[350px] max-h-screen overflow-hidden">
+    <div className="relative h-[650px] max-h-screen overflow-hidden">
       <Swiper
-        direction="vertical" // Vertical swipe
-        slidesPerView={2} // Show 2 cards at a time
-        spaceBetween={0} // No space between cards
+        direction="vertical"
+        slidesPerView={3} // Adjust to show more items
+        spaceBetween={10} // Add spacing for better visibility
         freeMode={true}
         modules={[FreeMode, Pagination]}
         className="h-full"
         breakpoints={{
-          340: {
-            slidesPerView: 2, // Show 2 cards even on small screens
-            spaceBetween: 0, // No space on small screens
-          },
-          700: {
-            slidesPerView: 2, // Show 2 cards on larger screens as well
-            spaceBetween: 0, // No space between cards
-          },
+          340: { slidesPerView: 3, spaceBetween: 10 },
+          700: { slidesPerView: 4, spaceBetween: 10 },
         }}
       >
         {ServiceData.map((item, index) => (
@@ -80,7 +76,9 @@ const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
 
                 {/* Right side: Title and Description */}
                 <div className="w-2/3 pl-4 flex flex-col justify-center">
-                  <h1 className="text-white text-xl font-semibold">{item.title}</h1>
+                  <h1 className="text-white text-xl font-semibold">
+                    {item.title}
+                  </h1>
                   <p className="text-white text-sm mt-2">{item.description}</p>
                 </div>
               </div>
@@ -89,7 +87,10 @@ const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
         ))}
       </Swiper>
 
-      {showModal && currentItem && currentImageUrl && currentItem === ServiceData[ServiceData.length - 1].title ? (
+      {showModal &&
+      currentItem &&
+      currentImageUrl &&
+      currentItem === ServiceData[ServiceData.length - 1].title ? (
         <ChangeCustomJob
           showModal={showModal}
           newTitle={newTitle}
@@ -102,7 +103,10 @@ const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
         />
       ) : null}
 
-      {showModal && currentItem && currentImageUrl && currentItem !== ServiceData[ServiceData.length - 1].title ? (
+      {showModal &&
+      currentItem &&
+      currentImageUrl &&
+      currentItem !== ServiceData[ServiceData.length - 1].title ? (
         <JobCard
           showModal={showModal}
           setShowModal={setShowModal}

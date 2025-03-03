@@ -19,7 +19,7 @@ const Review = () => {
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [savePayload, setSavePayload] = useState<any>(null);
+  const [savePayload, setSavePayload] = useState<unknown>(null);
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("sessionId");
   const [isSendingEmail, setIsSendingEmail] = useState(false);
@@ -100,7 +100,7 @@ const Review = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...savePayload, email }),
+        body: JSON.stringify({ ...(savePayload as Record<string, unknown>), email }),
       });
 
       if (!response.ok) throw new Error("Failed to generate PDF");
@@ -109,7 +109,7 @@ const Review = () => {
       setIsEmailSent(true);
     } catch (error) {
       setIsSendingEmail(false);
-      setError("Error sending report.");
+      setError("Error sending report. (" + error + ")");
     }
   };
 
@@ -140,7 +140,7 @@ const Review = () => {
       </div>
 
       {/* Save and Exit Buttons */}
-      <div className="flex gap-4 mt-3 mx-auto mb-10 mt-7">
+      <div className="flex gap-4 mx-auto mb-10 mt-7">
         <button onClick={handleSave} disabled={isEmailSent} className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
           Save
         </button>

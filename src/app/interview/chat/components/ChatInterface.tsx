@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { IoSend } from "react-icons/io5";
 // import { Timer } from "lucide-react";
 import InterviewOverModal from "../../../../components/ui/modals/InterviewOverModal";
 
 interface ChatInterfaceProps {
-  currentItem: string;
+  currentItem: string; // job that the interviewee chose
   sessionId: string | null;
 }
 
@@ -30,11 +30,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [currentEntity, setCurrentEntity] = useState<Entity | null>(null);
 
   // Function to format time
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
+  // const formatTime = (seconds: number): string => {
+  //   const minutes = Math.floor(seconds / 60);
+  //   const remainingSeconds = Math.floor(seconds % 60);
+  //   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  // };
 
   // // Function to check remaining time
   // const checkRemainingTime = async () => {
@@ -63,14 +63,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   //   }
   // }, [currentItem]);
 
-  const startInterview = async () => {
+  const startInterview = useCallback(async () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/start-interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ job: currentItem }),
       });
-
+  
       const data = await response.json();
       setMessages([{ sender: "bot", text: data.next_question }]);
       setCurrentEntity(data.entity);
@@ -78,7 +78,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } catch (error) {
       console.error("Error starting interview:", error);
     }
-  };
+  }, [currentItem]); 
+  
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isWaiting) return;
@@ -114,6 +115,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Update remaining time from response
       if (data.remaining_time !== undefined) {
         setRemainingTime(data.remaining_time);
+        console.log("Remaining Time:", remainingTime);
       }
     } catch (error) {
       console.error("Error processing answer:", error);
@@ -145,7 +147,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (currentItem) {
       startInterview();
     }
-  }, [currentItem]);
+  }, [currentItem, startInterview]);
 
   // Scroll to the bottom of the chat area, not the entire page
   useEffect(() => {

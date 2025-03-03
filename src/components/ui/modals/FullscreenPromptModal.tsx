@@ -8,7 +8,6 @@ interface FullscreenPromptModalProps {
 
 const FullscreenPromptModal: React.FC<FullscreenPromptModalProps> = ({
   showModal,
-  setShowModal,
   handleConfirm,
 }) => {
   if (!showModal) return null; // Prevent rendering when not needed
