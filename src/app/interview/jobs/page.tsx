@@ -50,14 +50,15 @@ export default function Jobs() {
       </div>
       <div className="text-center text-m md:text-l m-8">
         Before we begin, please choose a job position you&apos;re interested in from the list below. <br />
-        If your desired job isn&apos;t listed, you can select the &apos;Custom Job&apos; option to enter it manually.
+        If your desired job isn&apos;t listed, you can select the &apos;Custom Job&apos; option to enter it manually. <br /> <br />
+        Ensure the custom job title is properly formatted with correct punctuation, capitalization, and spelling for clarity and professionalism.
+
       </div>
+      
       <div className="px-8 md:px-16 lg:px-32 flex-grow z-10 relative">
         <JobSlider sessionId={sessionId} chosenJob={chosenJob} />  {/* setChosenJob or chosenJob ??? */}
       </div>
-      <p className="text-xs text-center text-gray-600 mx-auto absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20">
-        For the &quot;Custom Job&quot;, make sure the job title you enter is properly formatted, including correct punctuation and capitalization. Double-check for any spelling errors to ensure it’s clear and professional.
-      </p>
+      
 
       {showExitModal && (
         <ExitConfirmationModal

@@ -11,8 +11,14 @@ const InterviewOverModal: React.FC<InterviewOverModalProps> = ({ sessionId }) =>
   const router = useRouter();
 
   const handleRedirect = () => {
-    if (sessionId) {
-      router.push(`/review?sessionId=${sessionId}`);
+    if (sessionId ) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().then(() => {
+          router.push(`/review?sessionId=${sessionId}`);
+        });
+      } else {
+        router.push(`/review?sessionId=${sessionId}`);
+      }
     } else {
       router.push("/review");
     }

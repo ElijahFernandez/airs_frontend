@@ -2,7 +2,7 @@ export default function TermsPage() {
     return (
       <div className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-3xl font-bold mb-6">Terms and Conditions</h1>
-        <p className="text-gray-600 mb-6">Last Updated: February 13, 2025</p>
+        <p className="text-gray-600 mb-6">Last Updated: March 04, 2025</p>
   
         <section className="mb-8">
           <p>
@@ -25,8 +25,10 @@ export default function TermsPage() {
           <h2 className="text-xl font-semibold mb-4">2. Data Collection & Privacy</h2>
           <ul className="list-disc pl-6 space-y-2">
             <li>We do not require user accounts to access the Service.</li>
+            <li>We store user data temporarily for research and analysis purposes to enhance the accuracy and effectiveness of our system.</li>
+            <li>Aggregated and anonymized data may be used in research publications.</li>
             <li>Data is collected on a session basis and disappears once the user closes the browser.</li>
-            <li>Users may choose to receive a copy of their results via email before closing their session, but no data is stored beyond that point.</li>
+            <li>Users may choose to receive a copy of their results via email before closing their session.</li>
           </ul>
         </section>
   

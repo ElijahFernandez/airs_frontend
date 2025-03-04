@@ -8,6 +8,8 @@ import LoadingModal from "./../../components/ui/modals/LoadingModal";
 import ExitConfirmationModal from "./../../components/ui/modals/ExitConfirmationModal";
 import { useRouter } from "next/navigation";
 import SearchParamsHandler from "./components/SearchParamsHandler";
+import { db } from "../../lib/firebaseConfig"; // Ensure correct Firestore setup
+import { collection, addDoc } from "firebase/firestore";
 
 interface RatedDataEntry {
   question: string;
@@ -25,6 +27,7 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
   const router = useRouter();
+  const [emailEntered, setEmailEntered] = useState(false); // Track if email is provided
 
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -63,6 +66,10 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
     return scoreSums.map((sum) => Math.round((sum / count) * 20));
   };
 
+  const handleEmailChange = (email: string) => {
+    setEmailEntered(!!email.trim()); // Enable exit button when email is entered
+  };
+
   const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageScores();
 
   const handleSave = () => {
@@ -85,6 +92,34 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
 
     setSavePayload(payload);
     setShowSaveModal(true);
+
+    const formattedRatedData = ratedData.map((entry) => ({
+      ...entry,
+      score: { predicted_scores: entry.score.predicted_scores[0] }, // Flattening the nested array
+    }));
+
+    const flattenedPayload = {
+      sessionId,
+      ratedData: formattedRatedData,
+      averageScores: {
+        relevance: computedScores[0],
+        clarity: computedScores[1],
+        depth: computedScores[2],
+        professionalism: computedScores[3],
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    const saveToFirestore = async () => {
+      try {
+        await addDoc(collection(db, "savedReports"), flattenedPayload);
+        console.log("Report successfully saved to Firestore!");
+      } catch (error) {
+        setError("Error saving report to Firestore. (" + error + ")");
+      }
+    };
+
+    saveToFirestore();
   };
 
   const handleConfirmSave = async (email: string) => {
@@ -105,10 +140,13 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
 
       setIsSendingEmail(false);
       setIsEmailSent(true);
+      setEmailEntered(true); 
     } catch (error) {
       setIsSendingEmail(false);
       setError("Error sending report. (" + error + ")");
     }
+
+    
   };
 
   const handleExit = () => {
@@ -141,7 +179,13 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
         <button onClick={handleSave} disabled={isEmailSent} className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
           Save
         </button>
-        <button onClick={handleExit} className="px-4 py-2 border border-clarity text-clarity rounded-lg hover:bg-clarity hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
+        <button
+          onClick={handleExit}
+          disabled={!emailEntered}
+          className={`px-4 py-2 border border-clarity text-clarity rounded-lg transition duration-300 ease-in-out transform hover:scale-105 ${
+            emailEntered ? "hover:bg-clarity hover:text-white" : "opacity-50 cursor-not-allowed"
+          }`}
+        >
           Exit
         </button>
       </div>

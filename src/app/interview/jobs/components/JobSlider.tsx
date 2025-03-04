@@ -46,7 +46,7 @@ const JobSlider: React.FC<JobSliderProps> = ({ sessionId }) => {
     <div className="relative h-[650px] max-h-screen overflow-hidden">
       <Swiper
         direction="vertical"
-        slidesPerView={3} // Adjust to show more items
+        slidesPerView={2} // Adjust to show more items
         spaceBetween={10} // Add spacing for better visibility
         freeMode={true}
         modules={[FreeMode, Pagination]}
