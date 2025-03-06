@@ -39,7 +39,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   // // Function to check remaining time
   // const checkRemainingTime = async () => {
   //   try {
-  //     const response = await fetch("http://127.0.0.1:5000/check-time");
+  //     const response = await fetch("http://127.0.0.1:5000/interview/check-time");
   //     const data = await response.json();
 
   //     if (data.remaining_time !== undefined) {
@@ -65,7 +65,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const startInterview = useCallback(async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/start-interview", {
+      const response = await fetch("http://127.0.0.1:5000/interview/start-interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ job: currentItem }),
@@ -89,7 +89,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setInputValue("");
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/answer", {
+      const response = await fetch("http://127.0.0.1:5000/interview/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

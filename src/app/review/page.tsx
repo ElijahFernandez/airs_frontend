@@ -66,9 +66,9 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
     return scoreSums.map((sum) => Math.round((sum / count) * 20));
   };
 
-  const handleEmailChange = (email: string) => {
-    setEmailEntered(!!email.trim()); // Enable exit button when email is entered
-  };
+  // const handleEmailChange = (email: string) => {
+  //   setEmailEntered(!!email.trim()); // Enable exit button when email is entered
+  // };
 
   const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageScores();
 
@@ -128,7 +128,7 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/generate-pdf", {
+      const response = await fetch("http://localhost:5000/pdf/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
