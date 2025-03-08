@@ -7,7 +7,6 @@ import SaveConfirmationModal from "./../../components/ui/modals/SaveConfirmation
 import LoadingModal from "./../../components/ui/modals/LoadingModal";
 import ExitConfirmationModal from "./../../components/ui/modals/ExitConfirmationModal";
 import { useRouter } from "next/navigation";
-import SearchParamsHandler from "./components/SearchParamsHandler";
 import { db } from "../../lib/firebaseConfig"; // Ensure correct Firestore setup
 import { collection, addDoc } from "firebase/firestore";
 
@@ -17,7 +16,8 @@ interface RatedDataEntry {
   score: { predicted_scores: number[][] };
 }
 
-const Review = ({ sessionId }: { sessionId: string | null }) => {
+const Review = () => {
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [ratedData, setRatedData] = useState<RatedDataEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
@@ -29,27 +29,64 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
   const router = useRouter();
   const [emailEntered, setEmailEntered] = useState(false); // Track if email is provided
 
-  useEffect(() => {
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
+  const helpfulLinks = {
+  Relevance: [
+    { title: "Writing Interview Questions", url: "https://www.indeed.com/career-advice/interviewing/writing-interview-questions" },
+    { title: "The Art of Crafting Effective Interview Questions", url: "https://www.theopennotebook.com/2023/09/26/the-art-of-crafting-effective-interview-questions/" },
+    { title: "How to Write Effective Qualitative Interview Questions", url: "https://uxmastery.com/how-to-write-effective-qualitative-interview-questions/" },
+    { title: "Six Ways to Ask Better Questions in Interviews", url: "https://thewritepractice.com/six-ways-to-ask-better-questions-in-interviews/" },
+    { title: "10 Tips for Effective Interview Questions", url: "https://voicedocs.com/en/blog/10-tips-for-effective-interview-questions" }
+  ],
+  Clarity: [
+    { title: "How to Write Job Interview Questions", url: "https://www.evidenced.app/blog/how-to-write-job-interview-questions" },
+    { title: "Writing Effective Interview Questions", url: "https://quillbot.com/courses/english-composition-ii-exposition-and-persuasion/chapter/writing-effective-interview-questions/" },
+    { title: "Ask Smart Questions Like a Professional Interviewer", url: "https://www.investors.com/news/management/leaders-and-success/ask-smart-questions-like-a-professional-interviewer/" },
+    { title: "Be Concise in an Interview", url: "https://jobsearchandinterviewcoach.com/how-to-be-concise-in-an-interview/" }
+  ],
+  Depth: [
+    { title: "Developing Effective Research Questions", url: "https://www.restack.io/p/developing-effective-research-questions-answer-effective-open-ended-questioning-techniques" },
+    { title: "Effective Feedback Strategies for Interviewees", url: "https://www.hrfraternity.com/hr-excellence/effective-feedback-strategies-for-interviewees-with-unclear-responses.html" },
+    { title: "Guidelines for Structured Interview Training", url: "https://www.loc.gov/extranet/cld/structured-interview-training/guidelines.html" }
+  ],
+  Professionalism: [
+    { title: "Situation, Task, Action, Result (STAR) Technique", url: "https://en.wikipedia.org/wiki/Situation%2C_task%2C_action%2C_result" },
+    { title: "Know These Interview Questions and How to Answer Them", url: "https://money.usnews.com/money/careers/interviewing/articles/know-these-interview-questions-and-how-to-answer-them" },
+    { title: "Interviewing Dos and Don’ts", url: "https://www.umf.maine.edu/careers/interviewing/interview-dos-and-donts/" },
+    { title: "Guidelines for Structured Interview Training", url: "https://www.loc.gov/extranet/cld/structured-interview-training/guidelines.html" },
+    { title: "Job Interview Tips: How to Make a Great Impression", url: "https://www.indeed.com/career-advice/interviewing/job-interview-tips-how-to-make-a-great-impression" }
+  ]
+};
 
-    const ratedDataString = sessionStorage.getItem("rated_data");
+  
+useEffect(() => {
+  // Retrieve sessionId from sessionStorage
+  const storedSessionId = sessionStorage.getItem("session_id");
+  if (storedSessionId) {
+    setSessionId(storedSessionId);
+  } else {
+    setError("Session ID is missing in sessionStorage.");
+  }
 
-    if (ratedDataString) {
-      try {
-        const ratedDataParsed = JSON.parse(ratedDataString);
-        if (ratedDataParsed.processed_data && Array.isArray(ratedDataParsed.processed_data)) {
-          setRatedData(ratedDataParsed.processed_data);
-        } else {
-          setError("Rated data does not contain 'processed_data' or it's not an array.");
-        }
-      } catch (err) {
-        setError("Error parsing rated data. (" + err + ")");
+  if (fetchedRef.current) return;
+  fetchedRef.current = true;
+
+  const ratedDataString = sessionStorage.getItem("rated_data");
+
+  if (ratedDataString) {
+    try {
+      const ratedDataParsed = JSON.parse(ratedDataString);
+      if (ratedDataParsed.processed_data && Array.isArray(ratedDataParsed.processed_data)) {
+        setRatedData(ratedDataParsed.processed_data);
+      } else {
+        setError("Rated data does not contain 'processed_data' or it's not an array.");
       }
-    } else {
-      setError("No rated data found.");
+    } catch (err) {
+      setError("Error parsing rated data. (" + err + ")");
     }
-  }, []);
+  } else {
+    setError("No rated data found.");
+  }
+}, []);
 
   const computeAverageScores = () => {
     if (!ratedData || ratedData.length === 0) return [0, 0, 0, 0];
@@ -66,18 +103,21 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
     return scoreSums.map((sum) => Math.round((sum / count) * 20));
   };
 
-  // const handleEmailChange = (email: string) => {
-  //   setEmailEntered(!!email.trim()); // Enable exit button when email is entered
-  // };
-
   const [avgRelevance, avgClarity, avgDepth, avgProfessionalism] = computeAverageScores();
+
+  const lowScoreCriteria = [
+    { name: "Relevance" as const, score: avgRelevance },
+    { name: "Clarity" as const, score: avgClarity },
+    { name: "Depth" as const, score: avgDepth },
+    { name: "Professionalism" as const, score: avgProfessionalism },
+  ].filter(criterion => criterion.score < 50);
 
   const handleSave = () => {
     if (!sessionId || !ratedData) {
       setError("Missing session ID or rated data.");
       return;
     }
-
+  
     const computedScores = computeAverageScores();
     const payload = {
       sessionId,
@@ -88,16 +128,33 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
         depth: computedScores[2],
         professionalism: computedScores[3],
       },
+      links: {} as Record<string, { title: string; url: string }[]>, 
+      timestamp: new Date().toISOString(),
     };
-
+  
+    const lowScoreCriteria = [
+      { name: "Relevance" as const, score: computedScores[0] },
+      { name: "Clarity" as const, score: computedScores[1] },
+      { name: "Depth" as const, score: computedScores[2] },
+      { name: "Professionalism" as const, score: computedScores[3] },
+    ].filter(criterion => criterion.score < 50);
+  
+    // Add the links to the payload for criteria with scores below 50
+    lowScoreCriteria.forEach(({ name }) => {
+      const storedLinks = sessionStorage.getItem(name);
+      const links = storedLinks ? JSON.parse(storedLinks) : [];
+      payload.links[name] = links; // Store the relevant links for each criterion
+    });
+  
+    // Show the modal to confirm save action
     setSavePayload(payload);
     setShowSaveModal(true);
-
+  
     const formattedRatedData = ratedData.map((entry) => ({
       ...entry,
       score: { predicted_scores: entry.score.predicted_scores[0] }, // Flattening the nested array
     }));
-
+  
     const flattenedPayload = {
       sessionId,
       ratedData: formattedRatedData,
@@ -107,9 +164,10 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
         depth: computedScores[2],
         professionalism: computedScores[3],
       },
+      links: payload.links, 
       timestamp: new Date().toISOString(),
     };
-
+  
     const saveToFirestore = async () => {
       try {
         await addDoc(collection(db, "savedReports"), flattenedPayload);
@@ -118,9 +176,10 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
         setError("Error saving report to Firestore. (" + error + ")");
       }
     };
-
+  
     saveToFirestore();
   };
+  
 
   const handleConfirmSave = async (email: string) => {
     setShowSaveModal(false);
@@ -145,8 +204,6 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
       setIsSendingEmail(false);
       setError("Error sending report. (" + error + ")");
     }
-
-    
   };
 
   const handleExit = () => {
@@ -158,8 +215,22 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
   };
 
   const handleConfirmExit = () => {
-    sessionStorage.removeItem("rated_data"); // Clear session storage
+    sessionStorage.clear(); // Clear session storage
     router.push("/"); // Redirect to home or another page
+  };
+
+  const selectRandomLinks = (links: { title: string; url: string }[], num: number) => {
+    const copiedLinks = [...links];
+    const randomLinks = [];
+  
+    // Randomly select 'num' links from the available ones
+    for (let i = 0; i < num; i++) {
+      if (copiedLinks.length === 0) break; // Stop if no links are left
+      const randomIndex = Math.floor(Math.random() * copiedLinks.length);
+      randomLinks.push(copiedLinks.splice(randomIndex, 1)[0]);
+    }
+  
+    return randomLinks;
   };
 
   return (
@@ -214,16 +285,55 @@ const Review = ({ sessionId }: { sessionId: string | null }) => {
       )}
 
       <LoadingModal show={isSendingEmail} />
+
+      <div className="mt-4 bg-gray-800 p-6 rounded-lg">
+  <h3 className="text-xl font-semibold text-white mb-4">Helpful Links</h3>
+      <div className="bg-gray-700 p-4 rounded-lg">
+          {lowScoreCriteria
+            .filter(({ score }) => score < 50) // Only process criteria with scores below 50
+            .map(({ name, score }) => {
+              // Retrieve the randomized links for this criterion from sessionStorage
+              let selectedLinks = [];
+
+              // Retrieve the links stored for this criterion (individual arrays per criterion)
+              const storedLinks = sessionStorage.getItem(name);
+              let randomizedLinks = storedLinks ? JSON.parse(storedLinks) : [];
+
+              if (randomizedLinks.length > 0) {
+                // If links are already stored, use them
+                selectedLinks = randomizedLinks;
+              } else {
+                // Otherwise, randomly select 2 links for this criterion
+                const allLinks = helpfulLinks[name] || [];
+                const randomLinks = selectRandomLinks(allLinks, 2);
+
+                // Store the selected links in sessionStorage under the specific criterion
+                sessionStorage.setItem(name, JSON.stringify(randomLinks));
+
+                selectedLinks = randomLinks; // Use the newly selected links
+              }
+
+              return (
+                <div key={name} className="mt-4">
+                  <p className="text-white">
+                    Your scores on <strong>{name}</strong> are below 50%. Here are some relevant links that may help:
+                  </p>
+                  <ul className="list-disc list-inside mt-2">
+                    {selectedLinks.map((link: { title: string; url: string }, index: number) => (
+                      <li key={index}>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                          {link.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default function ReviewPage() {
-  return (
-    <Suspense fallback={<div>Loading review...</div>}>
-      <SearchParamsHandler>
-        {({ sessionId }) => <Review sessionId={sessionId} />}
-      </SearchParamsHandler>
-    </Suspense>
-  );
-}
+export default Review;

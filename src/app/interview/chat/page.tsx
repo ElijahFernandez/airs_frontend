@@ -1,6 +1,5 @@
 "use client";
-import { Suspense } from "react";
-import { useEffect, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ChatInterface from "@/app/interview/chat/components/ChatInterface";
 import GradientOverlay from "@/components/ui/GradientOverlay";
@@ -9,45 +8,14 @@ import FullscreenPromptModal from "@/components/ui/modals/FullscreenPromptModal"
 import { AiOutlineHome } from "react-icons/ai"; // Import the Home icon
 import SearchParamsHandler from "./components/SearchParamsHandler";
 
-export default function Chat() {
+const Chat: React.FC = () => {
   const router = useRouter();
-  // const searchParams = useSearchParams();
   const [showExitModal, setShowExitModal] = useState(false);
   const [showFullscreenModal, setShowFullscreenModal] = useState(true); // Show modal on render
 
-  // const currentItem = searchParams.get("job") || "defaultItem";
-  // const sessionId = searchParams.get("session") || null;
-
-  useEffect(() => {
-    const handleBackNavigation = (event: PopStateEvent) => {
-      event.preventDefault();
-      setShowExitModal(true);
-      window.history.pushState(null, "", window.location.href);
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
-        event.preventDefault();
-      }
-    };
-
-    const disableContextMenu = (event: MouseEvent) => {
-      event.preventDefault();
-    };
-
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handleBackNavigation);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("contextmenu", disableContextMenu);
-
-    return () => {
-      window.removeEventListener("popstate", handleBackNavigation);
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("contextmenu", disableContextMenu);
-    };
-  }, []);
-
   const handleExit = () => {
+    sessionStorage.clear();
+
     if (document.fullscreenElement) {
       document
         .exitFullscreen()
@@ -69,7 +37,9 @@ export default function Chat() {
       console.log("Entered fullscreen mode");
       setShowFullscreenModal(false); // Close modal only if fullscreen is active
     } else {
-      setShowExitModal(true);
+      if (!sessionStorage.getItem("manual_exit")) {
+        setShowExitModal(true);
+      }
       console.log("Exited fullscreen mode");
     }
   };
@@ -106,12 +76,14 @@ export default function Chat() {
   return (
     <div className="min-h-screen flex flex-col">
       <GradientOverlay />
-      {/* Home Icon Button */}
+      {/* Home Icon */}
       <div>
         <button
           className="fixed top-6 left-6 p-2 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 shadow"
           onClick={() => {
-            setShowExitModal(true);
+            if (!sessionStorage.getItem("manual_exit")) {
+              setShowExitModal(true);
+            }
           }}
         >
           <AiOutlineHome className="text-3xl text-gray-800 dark:text-gray-200" />
@@ -123,14 +95,16 @@ export default function Chat() {
           <Suspense fallback={<div>Loading chat...</div>}>
             <SearchParamsHandler>
               {({ job, session }) => (
-                <ChatInterface currentItem={job} sessionId={session} />
+                <ChatInterface
+                  currentItem={job}
+                  sessionId={session}
+                />
               )}
             </SearchParamsHandler>
           </Suspense>
         </div>
       </div>
 
-      {/* Fullscreen Modal */}
       {showFullscreenModal && (
         <FullscreenPromptModal
           showModal={showFullscreenModal}
@@ -139,7 +113,6 @@ export default function Chat() {
         />
       )}
 
-      {/* Exit Confirmation Modal */}
       {showExitModal && (
         <ExitConfirmationModal
           showModal={showExitModal}
@@ -150,4 +123,6 @@ export default function Chat() {
       )}
     </div>
   );
-}
+};
+
+export default Chat;

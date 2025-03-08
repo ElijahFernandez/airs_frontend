@@ -12,6 +12,7 @@ const InterviewOverModal: React.FC<InterviewOverModalProps> = ({ sessionId }) =>
 
   const handleRedirect = () => {
     if (sessionId ) {
+      sessionStorage.setItem("manual_exit", "true");
       if (document.fullscreenElement) {
         document.exitFullscreen().then(() => {
           router.push(`/review?sessionId=${sessionId}`);
@@ -41,9 +42,7 @@ const InterviewOverModal: React.FC<InterviewOverModalProps> = ({ sessionId }) =>
         <div className="flex-grow flex flex-col items-center justify-center text-center space-y-4 px-6">
           <h2 className="text-white text-2xl font-bold">Time&apos;s Up!</h2>
           <p className="text-white text-sm leading-relaxed">
-            It looks like that&apos;s all the time we have for today. Thank you for your cooperation! 
-            We will review your performance and get back to you soon with the results of this interview, 
-            regardless of the outcome. Have a great day!
+          Thank you for your time today! We will review your performance and get back to you with the results soon. Have a great day!
           </p>
         </div>
 
