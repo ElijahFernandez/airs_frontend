@@ -2,33 +2,30 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { IoSend } from "react-icons/io5";
-// import { Timer } from "lucide-react";
 import InterviewOverModal from "../../../../components/ui/modals/InterviewOverModal";
+import InterviewEndConfirmation from "../../../../components/ui/modals/InterviewEndConfirmation";
 
 interface ChatInterfaceProps {
-  currentItem: string; // job that the interviewee chose
+  currentItem: string;
   sessionId: string | null;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  currentItem,
-  sessionId,
-}) => {
-  const [messages, setMessages] = useState<
-    { sender: "bot" | "user"; text: string }[]
-  >([]);
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ currentItem, sessionId }) => {
+  const [messages, setMessages] = useState<{ sender: "bot" | "user"; text: string }[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isWaiting, setIsWaiting] = useState(false);
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref for auto-scroll
-  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showEndConfirmation, setShowEndConfirmation] = useState(false); // New state for confirmation modal
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null); // Toast message
+  const [terminateInterview, setTerminateInterview] = useState(false);
 
   interface Entity {
     question: string;
   }
-
   const [currentEntity, setCurrentEntity] = useState<Entity | null>(null);
 
+  // Start the interview
   const startInterview = useCallback(async () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/interview/start-interview", {
@@ -36,7 +33,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ job: currentItem }),
       });
-  
+
       const data = await response.json();
       setMessages([{ sender: "bot", text: data.next_question }]);
       setCurrentEntity(data.entity);
@@ -45,6 +42,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [currentItem]);
 
+  // Handle sending user message
   const sendMessage = async () => {
     if (!inputValue.trim() || isWaiting) return;
 
@@ -61,24 +59,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           answer: inputValue,
         }),
       });
-
+    
       const data = await response.json();
-
-      if (data.interview_data && data.rated_data) {
+    
+      // Log interview_data and rated_data for debugging
+      console.log("Received interview_data:", data.interview_data);
+      console.log("Received rated_data:", data.rated_data);
+    
+      if ((data.interview_data && data.rated_data) || terminateInterview) {
         navigateToNextPage(data.interview_data, data.rated_data);
       }
-
+    
       if (data.question) {
-        setMessages((prev) => [
-          ...prev,
-          { sender: "bot", text: data.question },
-        ]);
+        setMessages((prev) => [...prev, { sender: "bot", text: data.question }]);
         setCurrentEntity({ question: data.question });
-      }
-
-      // Update remaining time from response
-      if (data.remaining_time !== undefined) {
-        setRemainingTime(data.remaining_time);
       }
     } catch (error) {
       console.error("Error processing answer:", error);
@@ -89,17 +83,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } finally {
       setIsWaiting(false);
     }
+    
+  };
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null); // Automatically hide the toast after 2 seconds
+    }, 2000);
   };
 
   function navigateToNextPage(interviewData: unknown, ratedData: unknown) {
-    // Store the rated data which should now have the correct format
     sessionStorage.setItem("rated_data", JSON.stringify(ratedData));
     if (sessionId) sessionStorage.setItem("session_id", sessionId);
 
-    // For debugging, log what was stored
-    const storedData = sessionStorage.getItem("rated_data");
-    console.log("Stored Data:", storedData);
-
+    console.log("Stored Data:", sessionStorage.getItem("rated_data"));
     setShowModal(true);
   }
 
@@ -109,7 +107,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [currentItem, startInterview]);
 
-  // Scroll to the bottom of the chat area, not the entire page
+  // Scroll to the bottom of the chat when new messages arrive
   useEffect(() => {
     const chatContainer = messagesEndRef.current?.parentElement;
     if (chatContainer) {
@@ -117,11 +115,61 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [messages]);
 
+  // Listen for Alt+E to open the confirmation modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.altKey && event.key.toLowerCase() === "e") {
+        setShowEndConfirmation(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Handle key press for sending messages
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       sendMessage();
     }
   };
+
+  useEffect(() => {
+    if (terminateInterview) {
+      fetch("http://127.0.0.1:5000/interview/terminate-interview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Terminate response:", data.message); // Debugging
+  
+          // Now send the termination request to /answer
+          return fetch("http://127.0.0.1:5000/interview/answer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ terminate: true }), 
+          });
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Final interview response:", data); // Debugging
+  
+          if (data.interview_data && data.rated_data) {
+            navigateToNextPage(data.interview_data, data.rated_data);
+          } else {
+            console.warn("Missing interview_data or rated_data.");
+          }
+  
+          // Show the interview over modal
+          setShowModal(true);
+        })
+        .catch((error) => {
+          console.error("Error in termination sequence:", error);
+        });
+    }
+  }, [terminateInterview]);
+  
 
   return (
     <div className="flex w-full h-full">
@@ -154,6 +202,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
+            onPaste={(e) => {
+              e.preventDefault(); // Disable paste
+              showToast("Pasting is not allowed.");
+            }}
+            onCopy={(e) => {
+              e.preventDefault(); // Disable copy
+              showToast("Copying is not allowed.");
+            }}
+            onCut={(e) => {
+              e.preventDefault(); // Disable copy
+              showToast("Cutting is not allowed.");
+            }}
             disabled={isWaiting}
             className="flex-1 p-2 border border-gray-700 rounded-lg bg-gray-900 text-white placeholder-gray-500"
           />
@@ -172,6 +232,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {showModal && <InterviewOverModal sessionId={sessionId} />}
+      {showEndConfirmation && (
+        <InterviewEndConfirmation
+          onClose={() => setShowEndConfirmation(false)}
+          onConfirm={() => setTerminateInterview(true)}
+        />
+      )}
     </div>
   );
 };
