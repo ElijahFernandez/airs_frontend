@@ -250,43 +250,34 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   useEffect(() => {
     if (terminateInterview) {
-      // Clear both timers
-      if (clientTimerRef.current) {
-        clearInterval(clientTimerRef.current);
-      }
-      // if (serverCheckTimerRef.current) {
-      //   clearInterval(serverCheckTimerRef.current);
-      // }
-
       fetch("http://127.0.0.1:5000/interview/terminate-interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Terminate response:", data.message);
-
+          console.log("Terminate response:", data.message); // Debugging
+  
           // Now send the termination request to /answer
           return fetch("http://127.0.0.1:5000/interview/answer", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              session_id: sessionId, // Include session ID
-              question: "Termination request",
-              answer: "[INTERVIEW_TERMINATED]",
-            }),
+            body: JSON.stringify({ 
+              session_id: sessionId,
+              terminate: true }), 
           });
         })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Final interview response:", data);
-
+          console.log("Final interview response:", data); // Debugging
+  
           if (data.interview_data && data.rated_data) {
             navigateToNextPage(data.interview_data, data.rated_data);
           } else {
             console.warn("Missing interview_data or rated_data.");
           }
-
+  
           // Show the interview over modal
           setShowModal(true);
         })
@@ -295,6 +286,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         });
     }
   }, [terminateInterview]);
+  
 
   return (
     <div className="flex w-full h-full">

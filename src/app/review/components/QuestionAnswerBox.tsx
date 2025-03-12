@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client"
+
+import React, { useState, useEffect } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 
 interface QuestionAnswerBoxProps {
@@ -28,6 +30,70 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
   const [refinedFeedback, setRefinedFeedback] = useState("");
   const [sparklesDisabled, setSparklesDisabled] = useState(false);
   const [currentRubric, setCurrentRubric] = useState("");
+  const [isFeedbackReady, setIsFeedbackReady] = useState(false);
+  
+
+  useEffect(() => {
+    const fetchRefinedFeedback = async () => {
+      try {
+        const storedFeedback = sessionStorage.getItem("refinedFeedbackArray");
+        const feedbackArray = storedFeedback ? JSON.parse(storedFeedback) : [];
+  
+        if (feedbackArray[index] && feedbackArray[index] !== "loading") {
+          setRefinedFeedback(feedbackArray[index]);
+          setIsFeedbackReady(true);
+          return;
+        }
+  
+        const response = await fetch("http://127.0.0.1:5000/highlight/refine_response", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, response: answer, scores }),
+        });
+  
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+  
+        const data = await response.json();
+        const refinedFeedback = data.refined_feedback;
+
+        const updateSessionStorage = (index: number, refinedFeedback: string) => {
+          try {
+            const storedFeedback = sessionStorage.getItem("refinedFeedbackArray");
+            const feedbackArray = storedFeedback ? JSON.parse(storedFeedback) : [];
+        
+            // Ensure the array has the correct length
+            while (feedbackArray.length < totalQuestions) {
+              feedbackArray.push("loading");
+            }
+        
+            feedbackArray[index] = refinedFeedback;
+            sessionStorage.setItem("refinedFeedbackArray", JSON.stringify(feedbackArray));
+          } catch (error) {
+            console.error("Failed to update sessionStorage:", error);
+          }
+        };
+        
+  
+        // Update session storage using the helper function
+        updateSessionStorage(index, refinedFeedback);
+  
+        setRefinedFeedback(refinedFeedback);
+        setIsFeedbackReady(true);
+      } catch (error) {
+        console.error("Error fetching refined feedback:", error);
+        setRefinedFeedback("Error fetching refined feedback.");
+      }
+    };
+  
+    fetchRefinedFeedback();
+  }, [question, answer, scores, index, totalQuestions]);
+  
+  
+  
+  
+  
+  
+  
 
   const highlightText = (text: string, highlightPhrases: string[]) => {
     if (!highlightPhrases.length) return text;
@@ -89,38 +155,13 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
     }
   };
 
-  const handleSparklesClick = async () => {
-    // Show the extra content area
+  const handleSparklesClick = () => {
     setShowExtra(true);
-    // Begin loading for sparkles button
     setSparklesLoading(true);
-    // Clear previous feedback if any
-    setRefinedFeedback("");
-    // Disable the sparkles button after it's pressed
-    setSparklesDisabled(true);
 
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:5000/highlight/refine_response",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question, response: answer, scores }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setRefinedFeedback(data.refined_feedback);
-    } catch (error) {
-      console.error("Error fetching refined feedback:", error);
-      setRefinedFeedback("Error fetching refined feedback.");
-    } finally {
+    setTimeout(() => {
       setSparklesLoading(false);
-    }
+    }, 500); // Simulate quick loading effect
   };
 
   return (
@@ -267,3 +308,4 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
 };
 
 export default QuestionAnswerBox;
+
