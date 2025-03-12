@@ -7,6 +7,7 @@ interface ProgressCircleProps {
   value: number;
   color?: string;
   description?: string;
+  size?: number; // Optional size prop in pixels
 }
 
 const ProgressCircle: React.FC<ProgressCircleProps> = ({
@@ -14,6 +15,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   value,
   color,
   description,
+  size = 112, // Default to 112px (w-28)
 }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -29,6 +31,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   return (
     <div
       className="w-28 text-center relative"
+      style={{ width: size, height: size }} // Dynamic width & height
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -36,6 +39,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
         value={animatedValue}
         text={`${animatedValue}%`}
         styles={{
+          root: { width: "100%", height: "100%" }, // Ensures it scales with the container
           path: {
             transition: "stroke-dashoffset 1.5s ease-in-out",
             stroke: color, // Use the color prop for the path color

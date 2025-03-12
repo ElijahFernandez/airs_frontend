@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
-import Link from "next/link";
 
 // Define the prop types
 interface MultiStepComponentProps {

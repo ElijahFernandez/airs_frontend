@@ -10,9 +10,9 @@ const FullscreenPromptModal: React.FC<FullscreenPromptModalProps> = ({
   showModal,
   handleConfirm,
 }) => {
-  if (!showModal) return null; // Prevent rendering when not needed
-
   const [currentPage, setCurrentPage] = useState(0);
+
+  if (!showModal) return null; // Prevent rendering when not needed
 
   // Content for each page
   const pages = [

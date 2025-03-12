@@ -119,7 +119,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ job: currentItem }),
+          body: JSON.stringify({ sessionId, job: currentItem }), // Send the sessionid to the backend
         }
       );
 
@@ -128,9 +128,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setCurrentEntity(data.entity);
 
       // Set initial timer (assuming the backend returns initial duration in seconds)
-      const initialDurationSeconds = data.remaining_time || 30; // Default 30 minutes if not provided
+      const initialDurationSeconds = data.remaining_time || 1800; // Default 30 minutes if not provided
       const initialDurationMinutes = initialDurationSeconds / 60;
-      
+
       setRemainingTime(initialDurationSeconds);
       interviewStartTimeRef.current = new Date();
       interviewDurationRef.current = initialDurationMinutes;
@@ -140,11 +140,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         clearInterval(clientTimerRef.current);
       }
       clientTimerRef.current = setInterval(updateClientTimer, 1000);
-      
     } catch (error) {
       console.error("Error starting interview:", error);
     }
-  }, [currentItem, updateClientTimer]);
+  }, [currentItem, sessionId, updateClientTimer]); // Add dependencies
 
   // Handle sending user message
   const sendMessage = async () => {
@@ -159,6 +158,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          session_id: sessionId, // Send the sessionid to the backend
           question: currentEntity?.question,
           answer: inputValue,
         }),
@@ -270,7 +270,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           return fetch("http://127.0.0.1:5000/interview/answer", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ terminate: true }),
+            body: JSON.stringify({
+              session_id: sessionId, // Include session ID
+              question: "Termination request",
+              answer: "[INTERVIEW_TERMINATED]",
+            }),
           });
         })
         .then((response) => response.json())
