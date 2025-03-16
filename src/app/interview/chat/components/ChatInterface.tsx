@@ -5,15 +5,18 @@ import { IoSend } from "react-icons/io5";
 import { FaClock } from "react-icons/fa";
 import InterviewOverModal from "../../../../components/ui/modals/InterviewOverModal";
 import InterviewEndConfirmation from "../../../../components/ui/modals/InterviewEndConfirmation";
+import { API_BASE_URL } from "@/utils/config";
 
 interface ChatInterfaceProps {
   currentItem: string;
   sessionId: string | null;
+  isFullscreen: boolean; // Added prop to track fullscreen status
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   currentItem,
   sessionId,
+  isFullscreen
 }) => {
   const [messages, setMessages] = useState<
     { sender: "bot" | "user"; text: string }[]
@@ -29,6 +32,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const clientTimerRef = useRef<NodeJS.Timeout | null>(null);
   const interviewStartTimeRef = useRef<Date | null>(null);
   const interviewDurationRef = useRef<number | null>(null);
+  const [isTimerPaused, setIsTimerPaused] = useState(false); // New state for timer pause status
 
   interface Entity {
     question: string;
@@ -67,55 +71,64 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, []);
 
-  // // Check remaining time with server (less frequent)
-  // const checkRemainingTimeWithServer = useCallback(async () => {
-  //   try {
-  //     const response = await fetch(
-  //       "http://127.0.0.1:5000/interview/check-time",
-  //       {
-  //         method: "GET",
-  //         headers: { "Content-Type": "application/json" },
-  //       }
-  //     );
+  // Effect to handle visibility change (Alt+Tab)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        setIsTimerPaused(true);
+      } else {
+        setIsTimerPaused(false);
+      }
+    };
 
-  //     const data = await response.json();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
-  //     if (response.ok) {
-  //       // Update the timer with the server time
-  //       setRemainingTime(data.remaining_time);
+  // Effect to handle fullscreen changes from parent
+  useEffect(() => {
+    setIsTimerPaused(!isFullscreen);
+  }, [isFullscreen]);
 
-  //       // Re-sync our client timer with server time
-  //       if (interviewStartTimeRef.current && interviewDurationRef.current) {
-  //         const now = new Date();
-  //         const serverRemainingSeconds = data.remaining_time;
-  //         const totalDurationSeconds = interviewDurationRef.current * 60;
-  //         const elapsedSeconds = totalDurationSeconds - serverRemainingSeconds;
+  // Effect to pause timer when interview completes
+  useEffect(() => {
+    if (terminateInterview) {
+      setIsTimerPaused(true);
+    }
+  }, [terminateInterview]);
 
-  //         // Calculate when the interview must have started according to server time
-  //         const adjustedStartTime = new Date(
-  //           now.getTime() - elapsedSeconds * 1000
-  //         );
-  //         interviewStartTimeRef.current = adjustedStartTime;
-  //       }
-
-  //       // End interview if server says time is up
-  //       if (data.end_interview) {
-  //         console.log("Server confirms time's up! Ending interview...");
-  //         setTerminateInterview(true);
-  //       }
-  //     } else {
-  //       console.error("Error checking time:", data.error);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error checking time:", error);
-  //   }
-  // }, []);
+  // Effect to manage timer interval based on pause status
+  useEffect(() => {
+    if (isTimerPaused) {
+      // Pause the timer
+      if (clientTimerRef.current) {
+        clearInterval(clientTimerRef.current);
+        clientTimerRef.current = null;
+      }
+    } else {
+      // Resume the timer with adjusted start time
+      if (
+        interviewStartTimeRef.current !== null &&
+        remainingTime !== null &&
+        interviewDurationRef.current !== null
+      ) {
+        const totalDurationSeconds = interviewDurationRef.current * 60;
+        const elapsedSeconds = totalDurationSeconds - remainingTime;
+        interviewStartTimeRef.current = new Date(
+          Date.now() - elapsedSeconds * 1000
+        );
+        clientTimerRef.current = setInterval(updateClientTimer, 1000);
+      }
+    }
+  }, [isTimerPaused, remainingTime, updateClientTimer]);
 
   // Start the interview
   const startInterview = useCallback(async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/interview/start-interview",
+        `${API_BASE_URL}/interview/start-interview`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -154,7 +167,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setInputValue("");
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/interview/answer", {
+      const response = await fetch(`${API_BASE_URL}/interview/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -200,14 +213,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }, 2000);
   };
 
-  function navigateToNextPage(interviewData: unknown, ratedData: unknown) {
-    sessionStorage.setItem("rated_data", JSON.stringify(ratedData));
-    if (sessionId) sessionStorage.setItem("session_id", sessionId);
+  const navigateToNextPage = useCallback(
+    (interviewData: unknown, ratedData: unknown) => {
+      sessionStorage.setItem("rated_data", JSON.stringify(ratedData));
+      if (sessionId) sessionStorage.setItem("session_id", sessionId);
 
-    console.log("Stored Data:", sessionStorage.getItem("rated_data"));
-    setShowModal(true);
-  }
-
+      console.log("Stored Data:", sessionStorage.getItem("rated_data"));
+      setShowModal(true);
+    },
+    [sessionId, setShowModal] // Dependencies
+  );
   useEffect(() => {
     if (currentItem) {
       startInterview();
@@ -250,7 +265,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   useEffect(() => {
     if (terminateInterview) {
-      fetch("http://127.0.0.1:5000/interview/terminate-interview", {
+      fetch(`${API_BASE_URL}/interview/terminate-interview`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: sessionId }),
@@ -258,26 +273,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         .then((response) => response.json())
         .then((data) => {
           console.log("Terminate response:", data.message); // Debugging
-  
+
           // Now send the termination request to /answer
-          return fetch("http://127.0.0.1:5000/interview/answer", {
+          return fetch(`${API_BASE_URL}/interview/answer`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
               session_id: sessionId,
-              terminate: true }), 
+              terminate: true,
+            }),
           });
         })
         .then((response) => response.json())
         .then((data) => {
           console.log("Final interview response:", data); // Debugging
-  
+
           if (data.interview_data && data.rated_data) {
             navigateToNextPage(data.interview_data, data.rated_data);
           } else {
             console.warn("Missing interview_data or rated_data.");
           }
-  
+
           // Show the interview over modal
           setShowModal(true);
         })
@@ -285,8 +301,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           console.error("Error in termination sequence:", error);
         });
     }
-  }, [terminateInterview]);
-  
+  }, [navigateToNextPage, sessionId, terminateInterview]);
 
   return (
     <div className="flex w-full h-full">

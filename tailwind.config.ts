@@ -28,6 +28,9 @@ export default {
         depth     : "#9C27B0",
         professionalism: "#FF9800",
       },
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+      },
     },
   },
   plugins: [],

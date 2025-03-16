@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import Congrats from "./components/Congrats";
 import ProgressCircle from "./components/ProgressCircle";
 import QuestionAnswerBox from "./components/QuestionAnswerBox";
@@ -9,6 +9,7 @@ import ExitConfirmationModal from "./../../components/ui/modals/ExitConfirmation
 import { useRouter } from "next/navigation";
 import { db } from "../../lib/firebaseConfig"; // Ensure correct Firestore setup
 import { collection, addDoc } from "firebase/firestore";
+import ConfettiEffect from "./components/ConfettiEffect";
 
 interface RatedDataEntry {
   question: string;
@@ -90,6 +91,36 @@ useEffect(() => {
     setError("No rated data found.");
   }
 }, []);
+
+useEffect(() => {
+  // Handle back/forward navigation
+  const handlePopState = () => {
+    router.replace('/'); // Redirect to home page
+    // Clear session storage if needed
+    if (!isEmailSent) {
+      sessionStorage.clear();
+    }
+  };
+
+  // Handle page refresh or tab close
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if (!isEmailSent) {
+      e.preventDefault();
+      e.returnValue = ''; // Required for Chrome
+      return ''; // Required for other browsers
+    }
+  };
+
+  // Add initial history entry and event listeners
+  window.history.pushState(null, '', window.location.href);
+  window.addEventListener('popstate', handlePopState);
+  window.addEventListener('beforeunload', handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener('popstate', handlePopState);
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+  };
+}, [isEmailSent, router]); // Add router to dependencies
 
   const computeAverageScores = () => {
     if (!ratedData || ratedData.length === 0) return [0, 0, 0, 0];
@@ -234,7 +265,7 @@ useEffect(() => {
 
   const handleConfirmExit = () => {
     sessionStorage.clear(); // Clear session storage
-    router.push("/"); // Redirect to home or another page
+    router.replace("/"); // Redirect to home or another page
   };
 
   const selectRandomLinks = (links: { title: string; url: string }[], num: number) => {
@@ -254,6 +285,7 @@ useEffect(() => {
   return (
     <div className="max-w-4xl mx-auto p-4 flex flex-col items-center">
       <Congrats />
+      <ConfettiEffect />
       <h1 className="text-2xl font-semibold mb-4 text-center pb-5">Overall Scores:</h1>
 
       <div className="flex relative gap-10 justify-center m-10 pb-5">
@@ -314,10 +346,10 @@ useEffect(() => {
             .map(({ name, score }) => {
               // Retrieve the randomized links for this criterion from sessionStorage
               let selectedLinks = [];
-
+              console.log(score)
               // Retrieve the links stored for this criterion (individual arrays per criterion)
               const storedLinks = sessionStorage.getItem(name);
-              let randomizedLinks = storedLinks ? JSON.parse(storedLinks) : [];
+              const randomizedLinks = storedLinks ? JSON.parse(storedLinks) : [];
 
               if (randomizedLinks.length > 0) {
                 // If links are already stored, use them

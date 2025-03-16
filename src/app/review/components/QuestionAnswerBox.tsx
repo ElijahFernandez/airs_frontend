@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Loader2, Sparkles } from "lucide-react";
+import { API_BASE_URL } from "@/utils/config";
 
 interface QuestionAnswerBoxProps {
   question: string;
@@ -28,7 +29,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
   const [showExtra, setShowExtra] = useState(false);
   const [sparklesLoading, setSparklesLoading] = useState(false);
   const [refinedFeedback, setRefinedFeedback] = useState("");
-  const [sparklesDisabled, setSparklesDisabled] = useState(false);
+  const [sparklesDisabled] = useState(false);
   const [currentRubric, setCurrentRubric] = useState("");
   const [isFeedbackReady, setIsFeedbackReady] = useState(false);
   
@@ -45,7 +46,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
           return;
         }
   
-        const response = await fetch("http://127.0.0.1:5000/highlight/refine_response", {
+        const response = await fetch(`${API_BASE_URL}/highlight/refine_response`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question, response: answer, scores }),
@@ -78,6 +79,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
         updateSessionStorage(index, refinedFeedback);
   
         setRefinedFeedback(refinedFeedback);
+        console.log(isFeedbackReady)
         setIsFeedbackReady(true);
       } catch (error) {
         console.error("Error fetching refined feedback:", error);
@@ -86,15 +88,8 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
     };
   
     fetchRefinedFeedback();
-  }, [question, answer, scores, index, totalQuestions]);
+  }, [question, answer, scores, index, totalQuestions, isFeedbackReady]);
   
-  
-  
-  
-  
-  
-  
-
   const highlightText = (text: string, highlightPhrases: string[]) => {
     if (!highlightPhrases.length) return text;
 
@@ -135,7 +130,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
     setCurrentRubric(rubric);
 
     try {
-      const endpoint = `http://127.0.0.1:5000/highlight/${rubric}`;
+      const endpoint = `${API_BASE_URL}/highlight/${rubric}`;
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

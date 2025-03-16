@@ -12,6 +12,7 @@ const Chat: React.FC = () => {
   const router = useRouter();
   const [showExitModal, setShowExitModal] = useState(false);
   const [showFullscreenModal, setShowFullscreenModal] = useState(true); // Show modal on render
+  const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen status
 
   const handleExit = () => {
     sessionStorage.clear();
@@ -35,6 +36,7 @@ const Chat: React.FC = () => {
   const handleFullscreenChange = () => {
     if (document.fullscreenElement) {
       console.log("Entered fullscreen mode");
+      setIsFullscreen(true);
       setShowFullscreenModal(false); // Close modal only if fullscreen is active
     } else {
       if (!sessionStorage.getItem("manual_exit")) {
@@ -98,6 +100,7 @@ const Chat: React.FC = () => {
                 <ChatInterface
                   currentItem={job}
                   sessionId={session}
+                  isFullscreen={isFullscreen} // Pass isFullscreen to ChatInterface
                 />
               )}
             </SearchParamsHandler>

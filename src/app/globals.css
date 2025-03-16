@@ -1,10 +1,21 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter_24pt-Regular.woff2') format('woff2'); /* Replace with the actual path to the font file */
+  font-weight: 400; /* ExtraLight */
+  font-style: normal;
+  font-display: swap;
+}
 
 body {
-  @apply bg-midnight text-white;
+  font-family: 'Inter', sans-serif !important;
+  background-color: #020617; /* Replace with the actual color value for bg-midnight */
+  color: #ffffff; /* Replace with the actual color value for text-white */
+  
 }
 
 html {
