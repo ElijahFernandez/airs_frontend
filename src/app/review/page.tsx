@@ -14,8 +14,6 @@ import ConfettiEffect from "./components/ConfettiEffect";
 interface RatedDataEntry {
   question: string;
   answer: string;
-
-  
   score: { predicted_scores: number[][] };
 }
 
@@ -31,96 +29,106 @@ const Review = () => {
   const [showExitModal, setShowExitModal] = useState(false);
   const router = useRouter();
   const [emailEntered, setEmailEntered] = useState(false); // Track if email is provided
-  
+  const [isClient, setIsClient] = useState(false);
 
   const helpfulLinks = {
-  Relevance: [
-    { title: "Writing Interview Questions", url: "https://www.indeed.com/career-advice/interviewing/writing-interview-questions" },
-    { title: "The Art of Crafting Effective Interview Questions", url: "https://www.theopennotebook.com/2023/09/26/the-art-of-crafting-effective-interview-questions/" },
-    { title: "How to Write Effective Qualitative Interview Questions", url: "https://uxmastery.com/how-to-write-effective-qualitative-interview-questions/" },
-    { title: "Six Ways to Ask Better Questions in Interviews", url: "https://thewritepractice.com/six-ways-to-ask-better-questions-in-interviews/" },
-    { title: "10 Tips for Effective Interview Questions", url: "https://voicedocs.com/en/blog/10-tips-for-effective-interview-questions" }
-  ],
-  Clarity: [
-    { title: "How to Write Job Interview Questions", url: "https://www.evidenced.app/blog/how-to-write-job-interview-questions" },
-    { title: "Writing Effective Interview Questions", url: "https://quillbot.com/courses/english-composition-ii-exposition-and-persuasion/chapter/writing-effective-interview-questions/" },
-    { title: "Ask Smart Questions Like a Professional Interviewer", url: "https://www.investors.com/news/management/leaders-and-success/ask-smart-questions-like-a-professional-interviewer/" },
-    { title: "Be Concise in an Interview", url: "https://jobsearchandinterviewcoach.com/how-to-be-concise-in-an-interview/" }
-  ],
-  Depth: [
-    { title: "Developing Effective Research Questions", url: "https://www.restack.io/p/developing-effective-research-questions-answer-effective-open-ended-questioning-techniques" },
-    { title: "Effective Feedback Strategies for Interviewees", url: "https://www.hrfraternity.com/hr-excellence/effective-feedback-strategies-for-interviewees-with-unclear-responses.html" },
-    { title: "Guidelines for Structured Interview Training", url: "https://www.loc.gov/extranet/cld/structured-interview-training/guidelines.html" }
-  ],
-  Professionalism: [
-    { title: "Situation, Task, Action, Result (STAR) Technique", url: "https://en.wikipedia.org/wiki/Situation%2C_task%2C_action%2C_result" },
-    { title: "Know These Interview Questions and How to Answer Them", url: "https://money.usnews.com/money/careers/interviewing/articles/know-these-interview-questions-and-how-to-answer-them" },
-    { title: "Interviewing Dos and Don’ts", url: "https://www.umf.maine.edu/careers/interviewing/interview-dos-and-donts/" },
-    { title: "Guidelines for Structured Interview Training", url: "https://www.loc.gov/extranet/cld/structured-interview-training/guidelines.html" },
-    { title: "Job Interview Tips: How to Make a Great Impression", url: "https://www.indeed.com/career-advice/interviewing/job-interview-tips-how-to-make-a-great-impression" }
-  ]
-};
+    Relevance: [
+      { title: "Writing Interview Questions", url: "https://www.indeed.com/career-advice/interviewing/writing-interview-questions" },
+      { title: "The Art of Crafting Effective Interview Questions", url: "https://www.theopennotebook.com/2023/09/26/the-art-of-crafting-effective-interview-questions/" },
+      { title: "How to Write Effective Qualitative Interview Questions", url: "https://uxmastery.com/how-to-write-effective-qualitative-interview-questions/" },
+      { title: "Six Ways to Ask Better Questions in Interviews", url: "https://thewritepractice.com/six-ways-to-ask-better-questions-in-interviews/" },
+      { title: "10 Tips for Effective Interview Questions", url: "https://voicedocs.com/en/blog/10-tips-for-effective-interview-questions" }
+    ],
+    Clarity: [
+      { title: "How to Write Job Interview Questions", url: "https://www.evidenced.app/blog/how-to-write-job-interview-questions" },
+      { title: "Writing Effective Interview Questions", url: "https://quillbot.com/courses/english-composition-ii-exposition-and-persuasion/chapter/writing-effective-interview-questions/" },
+      { title: "Ask Smart Questions Like a Professional Interviewer", url: "https://www.investors.com/news/management/leaders-and-success/ask-smart-questions-like-a-professional-interviewer/" },
+      { title: "Be Concise in an Interview", url: "https://jobsearchandinterviewcoach.com/how-to-be-concise-in-an-interview/" }
+    ],
+    Depth: [
+      { title: "Developing Effective Research Questions", url: "https://www.restack.io/p/developing-effective-research-questions-answer-effective-open-ended-questioning-techniques" },
+      { title: "Effective Feedback Strategies for Interviewees", url: "https://www.hrfraternity.com/hr-excellence/effective-feedback-strategies-for-interviewees-with-unclear-responses.html" },
+      { title: "Guidelines for Structured Interview Training", url: "https://www.loc.gov/extranet/cld/structured-interview-training/guidelines.html" }
+    ],
+    Professionalism: [
+      { title: "Situation, Task, Action, Result (STAR) Technique", url: "https://en.wikipedia.org/wiki/Situation%2C_task%2C_action%2C_result" },
+      { title: "Know These Interview Questions and How to Answer Them", url: "https://money.usnews.com/money/careers/interviewing/articles/know-these-interview-questions-and-how-to-answer-them" },
+      { title: "Interviewing Dos and Don'ts", url: "https://www.umf.maine.edu/careers/interviewing/interview-dos-and-donts/" },
+      { title: "Guidelines for Structured Interview Training", url: "https://www.loc.gov/extranet/cld/structured-interview-training/guidelines.html" },
+      { title: "Job Interview Tips: How to Make a Great Impression", url: "https://www.indeed.com/career-advice/interviewing/job-interview-tips-how-to-make-a-great-impression" }
+    ]
+  };
 
+  // Set isClient to true once the component mounts
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
-useEffect(() => {
-  // Retrieve sessionId from sessionStorage
-  const storedSessionId = sessionStorage.getItem("session_id");
-  if (storedSessionId) {
-    setSessionId(storedSessionId);
-  } else {
-    setError("Session ID is missing in sessionStorage.");
-  }
+  useEffect(() => {
+    // Only execute if we're in the browser
+    if (!isClient) return;
+    
+    // Retrieve sessionId from sessionStorage
+    const storedSessionId = sessionStorage.getItem("session_id");
+    if (storedSessionId) {
+      setSessionId(storedSessionId);
+    } else {
+      setError("Session ID is missing in sessionStorage.");
+    }
 
-  if (fetchedRef.current) return;
-  fetchedRef.current = true;
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
 
-  const ratedDataString = sessionStorage.getItem("rated_data");
+    const ratedDataString = sessionStorage.getItem("rated_data");
 
-  if (ratedDataString) {
-    try {
-      const ratedDataParsed = JSON.parse(ratedDataString);
-      if (ratedDataParsed.processed_data && Array.isArray(ratedDataParsed.processed_data)) {
-        setRatedData(ratedDataParsed.processed_data);
-      } else {
-        setError("Rated data does not contain 'processed_data' or it's not an array.");
+    if (ratedDataString) {
+      try {
+        const ratedDataParsed = JSON.parse(ratedDataString);
+        if (ratedDataParsed.processed_data && Array.isArray(ratedDataParsed.processed_data)) {
+          setRatedData(ratedDataParsed.processed_data);
+        } else {
+          setError("Rated data does not contain 'processed_data' or it's not an array.");
+        }
+      } catch (err) {
+        setError("Error parsing rated data. (" + err + ")");
       }
-    } catch (err) {
-      setError("Error parsing rated data. (" + err + ")");
+    } else {
+      setError("No rated data found.");
     }
-  } else {
-    setError("No rated data found.");
-  }
-}, []);
+  }, [isClient]); // Now depends on isClient
 
-useEffect(() => {
-  // Handle back/forward navigation
-  const handlePopState = () => {
-    router.replace('/'); // Redirect to home page
-    // Clear session storage if needed
-    if (!isEmailSent) {
-      sessionStorage.clear();
-    }
-  };
+  useEffect(() => {
+    // Only add browser event listeners if we're in the browser
+    if (!isClient) return;
+    
+    // Handle back/forward navigation
+    const handlePopState = () => {
+      router.replace('/'); // Redirect to home page
+      // Clear session storage if needed
+      if (!isEmailSent) {
+        sessionStorage.clear();
+      }
+    };
 
-  // Handle page refresh or tab close
-  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-    if (!isEmailSent) {
-      e.preventDefault();
-      e.returnValue = ''; // Required for Chrome
-      return ''; // Required for other browsers
-    }
-  };
+    // Handle page refresh or tab close
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isEmailSent) {
+        e.preventDefault();
+        e.returnValue = ''; // Required for Chrome
+        return ''; // Required for other browsers
+      }
+    };
 
-  // Add initial history entry and event listeners
-  window.history.pushState(null, '', window.location.href);
-  window.addEventListener('popstate', handlePopState);
-  window.addEventListener('beforeunload', handleBeforeUnload);
+    // Add initial history entry and event listeners
+    window.history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
-  return () => {
-    window.removeEventListener('popstate', handlePopState);
-    window.removeEventListener('beforeunload', handleBeforeUnload);
-  };
-}, [isEmailSent, router]); // Add router to dependencies
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isEmailSent, router, isClient]); // Add isClient to dependencies
 
   const computeAverageScores = () => {
     if (!ratedData || ratedData.length === 0) return [0, 0, 0, 0];
@@ -147,6 +155,8 @@ useEffect(() => {
   ].filter(criterion => criterion.score < 50);
 
   const handleSave = () => {
+    if (!isClient) return; // Safety check
+    
     if (!sessionId || !ratedData) {
       setError("Missing session ID or rated data.");
       return;
@@ -228,8 +238,6 @@ useEffect(() => {
     saveToFirestore();
   };
   
-  
-
   const handleConfirmSave = async (email: string) => {
     setShowSaveModal(false);
     setIsSendingEmail(true);
@@ -264,7 +272,9 @@ useEffect(() => {
   };
 
   const handleConfirmExit = () => {
-    sessionStorage.clear(); // Clear session storage
+    if (isClient) {
+      sessionStorage.clear(); // Clear session storage only if we're in browser
+    }
     router.replace("/"); // Redirect to home or another page
   };
 
@@ -281,6 +291,11 @@ useEffect(() => {
   
     return randomLinks;
   };
+
+  // If we're rendering server-side, return minimal content
+  if (!isClient) {
+    return <div className="max-w-4xl mx-auto p-4 flex flex-col items-center">Loading...</div>;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-4 flex flex-col items-center">
@@ -335,7 +350,6 @@ useEffect(() => {
       )}
 
       <LoadingModal show={isSendingEmail} />
-
       
       {lowScoreCriteria.some(({ score }) => score < 50) && (
       <div className="mt-4 bg-gray-800 p-6 rounded-lg">
