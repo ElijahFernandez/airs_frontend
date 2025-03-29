@@ -14,6 +14,7 @@ const Navbar = () => {
             alt="AIRS Logo"
             width={100}              // Adjust width as needed
             height={100}             // Adjust height as needed
+            style={{ width: "auto", height: "auto" }} 
           />
         </Link>
       </div>

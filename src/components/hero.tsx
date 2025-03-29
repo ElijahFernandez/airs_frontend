@@ -28,6 +28,7 @@ const Hero = () => {
             alt="AIRS Logo"
             width={200}
             height={150}
+            style={{ width: "auto", height: "auto" }} 
           />
 
           <TextGenerateEffect

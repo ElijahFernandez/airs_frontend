@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="airs-b-bgr.png" sizes="any" />
+        <link rel="icon" href="/logos/airs-w-bgr.png" sizes="any" />
       </head>
       <body className={`${inter.className} bg-black-100`}>
         <ThemeProvider

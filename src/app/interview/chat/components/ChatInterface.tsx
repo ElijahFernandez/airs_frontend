@@ -33,7 +33,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const interviewStartTimeRef = useRef<Date | null>(null);
   const interviewDurationRef = useRef<number | null>(null);
   const [isTimerPaused, setIsTimerPaused] = useState(false); // New state for timer pause status
-
+  
   interface Entity {
     question: string;
   }
@@ -127,16 +127,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   // Start the interview
   const startInterview = useCallback(async () => {
     try {
+      if (!sessionId) {
+        console.error("No sessionId available!");
+        return; 
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/interview/start-interview`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId, job: currentItem }), // Send the sessionid to the backend
+          body: JSON.stringify({ session_id: sessionId, job: currentItem }), // ✅ Use session_id
         }
       );
 
       const data = await response.json();
+
       setMessages([{ sender: "bot", text: data.next_question }]);
       setCurrentEntity(data.entity);
 
