@@ -1,22 +1,47 @@
 // src/components/Footer.tsx
 import Link from "next/link";
 import Image from "next/image"; // Import the Image component
-
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 const Footer = () => {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure theme is loaded to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null; // Prevents flickering on first render
+
   return (
-    <footer className="bg-midlight text-white py-8 w-full">
+    <footer className="bg-backgroundgray text-foreground border border-black/[0.2] dark:border-white/[0.2] py-8 w-full">
       <div className="max-w-5xl mx-auto px-4">
-        {/* Top Section: Links */}
         <div className="flex flex-col md:flex-row justify-between items-center border-b border-gray-600 pb-6">
-          {/* Logo/Brand */}
           <div className="mb-4 md:mb-0">
-            {/* <h1 className="text-2xl font-bold">AIRS</h1> */}
-            <Image
+            {theme === "dark" ? (
+              <Image
+                src="/logos/airs-w-bgr.png" // Path relative to the public folder
+                alt="AIRS Logo"
+                width={100} // Adjust width as needed
+                height={150} // Adjust height as needed
+                className="w-auto h-auto" // ✅ Ensures aspect ratio is maintained
+              />
+            ) : (
+              <Image
+                src="/logos/airs-b-bgr.png" // Path relative to the public folder
+                alt="AIRS Logo"
+                width={100} // Adjust width as needed
+                height={150} // Adjust height as needed
+                className="w-auto h-auto" // ✅ Ensures aspect ratio is maintained
+              />
+            )}
+            {/* <Image
               src="/logos/airs-w-bgr.png" // Path relative to the public folder
               alt="AIRS Logo"
               width={100} // Adjust width as needed
               height={150} // Adjust height as needed
-            />
+              className="w-auto h-auto" // ✅ Ensures aspect ratio is maintained
+            /> */}
           </div>
 
           {/* Footer Links */}

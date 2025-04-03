@@ -10,6 +10,9 @@ import { useRouter } from "next/navigation";
 import { db } from "../../lib/firebaseConfig"; // Ensure correct Firestore setup
 import { collection, addDoc } from "firebase/firestore";
 import ConfettiEffect from "./components/ConfettiEffect";
+import { notFound } from "next/navigation";
+import { API_BASE_URL } from "@/utils/config";
+
 
 interface RatedDataEntry {
   question: string;
@@ -73,7 +76,8 @@ const Review = () => {
     if (storedSessionId) {
       setSessionId(storedSessionId);
     } else {
-      setError("Session ID is missing in sessionStorage.");
+      // setError("Session ID is missing in sessionStorage.");
+      notFound();
     }
 
     if (fetchedRef.current) return;
@@ -95,7 +99,7 @@ const Review = () => {
     } else {
       setError("No rated data found.");
     }
-  }, [isClient]); // Now depends on isClient
+  }, [isClient, router]); // Now depends on isClient
 
   useEffect(() => {
     // Only add browser event listeners if we're in the browser
@@ -244,7 +248,7 @@ const Review = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/pdf/generate-pdf", {
+      const response = await fetch(`${API_BASE_URL}/pdf/generate-pdf`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -352,9 +356,10 @@ const Review = () => {
       <LoadingModal show={isSendingEmail} />
       
       {lowScoreCriteria.some(({ score }) => score < 50) && (
-      <div className="mt-4 bg-gray-800 p-6 rounded-lg">
-      <h3 className="text-xl font-semibold text-white mb-4">Helpful Links</h3>
-      <div className="bg-gray-700 p-4 rounded-lg">
+      <div className="mt-4 p-9 bg-backgroundgray border border-black/[0.2] dark:border-white/[0.2] rounded-lg">
+      <h3 className="text-xl font-semibold text-foreground mb-4">Helpful Links</h3>
+      <hr className="mt-6 border-t border-gray-300 dark:border-gray-600" />
+      <div className="p-4 rounded-lg text-foreground">
           {lowScoreCriteria
             .filter(({ score }) => score < 50) // Only process criteria with scores below 50
             .map(({ name, score }) => {
@@ -381,7 +386,7 @@ const Review = () => {
 
               return (
                 <div key={name} className="mt-4">
-                  <p className="text-white">
+                  <p className="text-foreground">
                     Your scores on <strong>{name}</strong> are below 50%. Here are some relevant links that may help:
                   </p>
                   <ul className="list-disc list-inside mt-2">

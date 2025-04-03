@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "./provider";
+import { ThemeProvider } from "@/app/provider";
 import LayoutWrapper from "@/components/ui/LayoutWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,14 +20,8 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/logos/airs-w-bgr.png" sizes="any" />
       </head>
-      <body className={`${inter.className} bg-black-100`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* Wrap content in LayoutWrapper */}
+      <body className={`${inter.className} bg-background text-foreground`}>
+        <ThemeProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
         </ThemeProvider>
       </body>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
+import { useRouter } from "next/navigation"; // Add this import
 
 // Define the prop types
 interface MultiStepComponentProps {
@@ -13,6 +14,7 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
   const [checkboxStates, setCheckboxStates] = useState<boolean[]>(Array(2).fill(false)); // For Step 2
   const [showPolicyModal, setShowPolicyModal] = useState(false);
   const [policyContent, setPolicyContent] = useState("");
+  const router = useRouter(); 
 
   const totalSteps = 3;
 
@@ -45,6 +47,9 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
 
   const allCheckboxesChecked = checkboxStates.every((isChecked) => isChecked);
 
+  const handleFinalNavigation = () => {
+    router.push(`/interview/jobs?session=${sessionId}`);
+  };
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -53,7 +58,7 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
             <h1 className="text-2xl font-bold mb-4">
               Step 1: Ensure Internet Stability
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-lg text-foreground mb-6">
               Before we begin, check that you have a stable internet connection.
             </p>
             <Button onClick={goToNextStep}>Proceed to Step 2</Button>
@@ -79,7 +84,7 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
                     onChange={() => handleCheckboxChange(index)}
                     required
                   />
-                  <label className="text-gray-700 dark:text-gray-300">
+                  <label className="text-foreground">
                     {index === 1 ? (
                       <>
                         I agree to the{" "}
@@ -117,7 +122,7 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
         return (
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Step 3: Start the Interview</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-lg text-foregroundmb-6">
               On the next page, use the slider to pick a job that fits your skills and interests.
             </p>
             <div className="flex justify-between mt-6">
@@ -127,7 +132,7 @@ const MultiStepComponent: React.FC<MultiStepComponentProps> = ({ sessionId }) =>
               <Button
                 variant="primary"
                 onClick={() => {
-                  window.location.href = `/interview/jobs?session=${sessionId}`;
+                  handleFinalNavigation();
                 }}
               >
                 Proceed

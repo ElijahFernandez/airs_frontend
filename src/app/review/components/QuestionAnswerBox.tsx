@@ -161,7 +161,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
 
   return (
     <div className="flex flex-col gap-0 w-[800px]">
-      <div className="p-9 border border-black/[0.2] dark:border-white/[0.2] rounded-t-md bg-midlighter shadow-sm">
+      <div className="p-9 border border-black/[0.2] dark:border-white/[0.2] rounded-t-md bg-background shadow-sm">
         <div className="pb-2 top-1 left-2 text-gray-500 text-xs flex gap-3">
           <p>
             |&nbsp;&nbsp;&nbsp;{index + 1} / {totalQuestions}
@@ -170,7 +170,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
         <p className="font-medium pb-5 italic">&quot;{question}&quot;</p>
       </div>
 
-      <div className="p-9 border border-black/[0.2] dark:border-white/[0.2] rounded-b-md bg-midlight text-white shadow-md">
+      <div className="p-9 border border-black/[0.2] dark:border-white/[0.2] rounded-b-md bg-backgroundgray text-foreground shadow-md">
         <div className="pb-2 top-1 left-2 text-gray-500 text-xs">
           <p>Answer:</p>
         </div>
@@ -206,11 +206,11 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-start gap-2 mt-4 transition-all duration-300">
+        <div className="flex justify-start gap-2 mt-4 transition-all duration-300 font-semibold">
           <button
             onClick={() => analyzeResponse("analyze_relevance")}
             disabled={!!loading}
-            className="px-4 py-2 border border-relevance text-relevance rounded-md hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 border-2 border-relevance text-relevance rounded-md hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading === "analyze_relevance" ? (
               <>
@@ -226,7 +226,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
           <button
             onClick={() => analyzeResponse("analyze_clarity")}
             disabled={!!loading}
-            className="px-4 py-2 border border-clarity text-clarity rounded-md hover:bg-clarity hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 border-2 border-clarity text-clarity rounded-md hover:bg-clarity hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading === "analyze_clarity" ? (
               <>
@@ -242,7 +242,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
           <button
             onClick={() => analyzeResponse("analyze_depth")}
             disabled={!!loading}
-            className="px-4 py-2 border border-depth text-depth rounded-md hover:bg-depth hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 border-2 border-depth text-depth rounded-md hover:bg-depth hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading === "analyze_depth" ? (
               <>
@@ -258,7 +258,7 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
           <button
             onClick={() => analyzeResponse("analyze_professionalism")}
             disabled={!!loading}
-            className="px-4 py-2 border border-professionalism text-professionalism rounded-md hover:bg-professionalism hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 border-2 border-professionalism text-professionalism rounded-md hover:bg-professionalism hover:text-white transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {loading === "analyze_professionalism" ? (
               <>
@@ -274,17 +274,17 @@ const QuestionAnswerBox: React.FC<QuestionAnswerBoxProps> = ({
             <button
               onClick={handleSparklesClick}
               disabled={sparklesDisabled || sparklesLoading}
-              className={`group px-4 py-2 border rounded-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center ${
+              className={`group px-4 py-2 border-2 rounded-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center ${
                 sparklesDisabled
                   ? "border-gray-400 bg-gray-200 cursor-not-allowed"
-                  : "border-sparkles text-sparkles hover:bg-white"
+                  : "border-sparkles text-sparkles hover:bg-foreground"
               }`}
             >
               <Sparkles
                 className={`h-4 w-4 ${
                   sparklesDisabled
                     ? "text-gray-400"
-                    : "text-white group-hover:text-midnight"
+                    : "text-foreground group-hover:text-background"
                 }`}
               />
             </button>

@@ -10,13 +10,13 @@ import { API_BASE_URL } from "@/utils/config";
 interface ChatInterfaceProps {
   currentItem: string;
   sessionId: string | null;
-  isFullscreen: boolean; // Added prop to track fullscreen status
+  isFullscreen: boolean;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   currentItem,
   sessionId,
-  isFullscreen
+  isFullscreen,
 }) => {
   const [messages, setMessages] = useState<
     { sender: "bot" | "user"; text: string }[]
@@ -33,7 +33,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const interviewStartTimeRef = useRef<Date | null>(null);
   const interviewDurationRef = useRef<number | null>(null);
   const [isTimerPaused, setIsTimerPaused] = useState(false); // New state for timer pause status
-  
+  const [isTerminating, setIsTerminating] = useState(false);
+
   interface Entity {
     question: string;
   }
@@ -70,7 +71,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setTerminateInterview(true);
     }
   }, []);
-
+  useEffect(() => {
+    console.log("api base url", API_BASE_URL); // Debugging
+  }, []); // Debugging
   // Effect to handle visibility change (Alt+Tab)
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -129,7 +132,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     try {
       if (!sessionId) {
         console.error("No sessionId available!");
-        return; 
+        return;
       }
 
       const response = await fetch(
@@ -147,7 +150,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setCurrentEntity(data.entity);
 
       // Set initial timer (assuming the backend returns initial duration in seconds)
-      const initialDurationSeconds = data.remaining_time || 1800; // Default 30 minutes if not provided
+      const initialDurationSeconds = data.remaining_time || 900; // Default 30 minutes if not provided
       const initialDurationMinutes = initialDurationSeconds / 60;
 
       setRemainingTime(initialDurationSeconds);
@@ -186,8 +189,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       const data = await response.json();
 
       // Log interview_data and rated_data for debugging
-      console.log("Received interview_data:", data.interview_data);
-      console.log("Received rated_data:", data.rated_data);
+      // console.log("Received interview_data:", data.interview_data);
+      // console.log("Received rated_data:", data.rated_data);
 
       if ((data.interview_data && data.rated_data) || terminateInterview) {
         navigateToNextPage(data.interview_data, data.rated_data);
@@ -268,128 +271,199 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       sendMessage();
     }
   };
-
   useEffect(() => {
-    if (terminateInterview) {
-      fetch(`${API_BASE_URL}/interview/terminate-interview`, {
+    // Only proceed if we should terminate and we're not already in the process of terminating
+    if (terminateInterview && !isTerminating) {
+      setIsTerminating(true); // Set flag to prevent repeated calls
+    console.log("Starting termination process...");
+
+      // Make a single API call to /answer with terminate flag
+      fetch(`${API_BASE_URL}/interview/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
+        body: JSON.stringify({
+          session_id: sessionId,
+          question: currentEntity?.question || "Interview terminated",
+          answer: "iqoertj;nqwej;oqw",
+          terminate: true,
+        }),
       })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Terminate response:", data.message); // Debugging
-
-          // Now send the termination request to /answer
-          return fetch(`${API_BASE_URL}/interview/answer`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              session_id: sessionId,
-              terminate: true,
-            }),
-          });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+          }
+          return response.json();
         })
-        .then((response) => response.json())
         .then((data) => {
           console.log("Final interview response:", data); // Debugging
 
           if (data.interview_data && data.rated_data) {
             navigateToNextPage(data.interview_data, data.rated_data);
           } else {
-            console.warn("Missing interview_data or rated_data.");
+            console.error("Missing interview_data or rated_data:", data);
           }
 
           // Show the interview over modal
           setShowModal(true);
+
+          // Reset the termination flags to prevent further API calls
+          setTerminateInterview(false);
         })
         .catch((error) => {
           console.error("Error in termination sequence:", error);
+          // Reset flags on error too
+          setIsTerminating(false);
+          setTerminateInterview(false);
         });
     }
-  }, [navigateToNextPage, sessionId, terminateInterview]);
+  }, [
+    navigateToNextPage,
+    sessionId,
+    terminateInterview,
+    currentEntity,
+    isTerminating,
+  ]);
+  // useEffect(() => {
+  //   if (terminateInterview) {
+  //     fetch(`${API_BASE_URL}/interview/terminate-interview`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ session_id: sessionId }),
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log("Terminate response:", data.message); // Debugging
+
+  //         // Now send the termination request to /answer
+  //         return fetch(`${API_BASE_URL}/interview/answer`, {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({
+  //             session_id: sessionId,
+  //             question: currentEntity?.question || "Interview terminated",
+  //             answer: "",
+  //             terminate: true,
+  //           }),
+  //         });
+  //       })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log("Final interview response:", data); // Debugging
+
+  //         if (data.interview_data && data.rated_data) {
+  //           navigateToNextPage(data.interview_data, data.rated_data);
+  //         } else {
+  //           console.warn("Missing interview_data or rated_data.");
+  //         }
+
+  //         // Show the interview over modal
+  //         setShowModal(true);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error in termination sequence:", error);
+  //       });
+  //   }
+  // }, [navigateToNextPage, sessionId, terminateInterview, currentEntity]);
 
   return (
     <div className="flex w-full h-full">
-      <div className="relative flex flex-col flex-1 border border-gray-300 rounded-b-lg bg-black">
+      <div className="relative flex flex-col flex-1 max-w-7xl mx-auto bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-500">
         {/* Timer display */}
         {remainingTime !== null && (
-          <div className="absolute top-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-full flex items-center gap-2">
-            <FaClock size={16} />
-            <span>{formatTime(remainingTime)}</span>
+          <div className="absolute top-4 right-4 bg-gray-700/90 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-2 z-10 shadow-md">
+            <FaClock className="text-blue-400" size={16} />
+            <span className="font-medium">{formatTime(remainingTime)}</span>
           </div>
         )}
-        <div className="flex-1 overflow-y-auto p-4 max-h-[800px]">
+  
+        {/* Messages container */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`mb-3 flex ${
+              className={`flex ${
                 msg.sender === "bot" ? "justify-start" : "justify-end"
               }`}
             >
               <div
-                className={`inline-block p-3 rounded-lg max-w-[80%] break-words ${
+                className={`max-w-[85%] lg:max-w-[75%] p-4 rounded-2xl break-words transition-all duration-200 ${
                   msg.sender === "bot"
-                    ? "bg-gray-700 text-white"
-                    : "bg-blue-500 text-white"
-                }`}
+                    ? "bg-gray-700/80 text-white hover:bg-gray-700"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                } ${
+                  msg.sender === "bot" ? "rounded-tl-none" : "rounded-br-none"
+                } shadow-md`}
               >
-                {msg.text}
+                <p className="text-gray-100 leading-relaxed hyphens-auto">
+                  {msg.text}
+                </p>
               </div>
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
-
-        <div className="flex gap-2 p-3 bg-black border-t border-gray-700 mt-auto">
-          <input
-            type="text"
-            placeholder="Type your message..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyPress}
-            onPaste={(e) => {
-              e.preventDefault(); // Disable paste
-              showToast("Pasting is not allowed.");
-            }}
-            onCopy={(e) => {
-              e.preventDefault(); // Disable copy
-              showToast("Copying is not allowed.");
-            }}
-            onCut={(e) => {
-              e.preventDefault(); // Disable copy
-              showToast("Cutting is not allowed.");
-            }}
-            disabled={isWaiting}
-            className="flex-1 p-2 border border-gray-700 rounded-lg bg-gray-900 text-white placeholder-gray-500"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={isWaiting}
-            className={`p-2 rounded-lg flex items-center justify-center ${
-              isWaiting
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-blue-500 text-white"
-            }`}
-          >
-            <IoSend size={20} />
-          </button>
+  
+        {/* Input area */}
+        <div className="p-4 bg-gray-900/50 border-t border-gray-700 backdrop-blur-sm">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Type your message..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyPress}
+              onPaste={(e) => {
+                e.preventDefault();
+                showToast("Pasting is not allowed.");
+              }}
+              onCopy={(e) => {
+                e.preventDefault();
+                showToast("Copying is not allowed.");
+              }}
+              onCut={(e) => {
+                e.preventDefault();
+                showToast("Cutting is not allowed.");
+              }}
+              disabled={isWaiting}
+              className="flex-1 px-5 py-3 border border-gray-700 rounded-xl bg-gray-800 text-gray-200 placeholder-gray-500 
+                        focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
+                        disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={isWaiting}
+              className={`p-3 rounded-xl flex items-center justify-center transition-all
+                ${
+                  isWaiting
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-500 active:scale-95"
+                }`}
+            >
+              <IoSend className="text-white" size={20} />
+            </button>
+          </div>
         </div>
+  
         {/* Toast message */}
         {toastMessage && (
-          <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg">
+          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white px-4 py-2 rounded-lg 
+                          animate-fade-in-up shadow-lg">
             {toastMessage}
           </div>
         )}
+  
+        {/* Modals */}
+        {showModal && <InterviewOverModal sessionId={sessionId} />}
+        {showEndConfirmation && (
+          <InterviewEndConfirmation
+            onClose={() => setShowEndConfirmation(false)}
+            onConfirm={() => {
+              setShowEndConfirmation(false);
+              setTerminateInterview(true);
+            }}
+          />
+        )}
       </div>
-
-      {showModal && <InterviewOverModal sessionId={sessionId} />}
-      {showEndConfirmation && (
-        <InterviewEndConfirmation
-          onClose={() => setShowEndConfirmation(false)}
-          onConfirm={() => setTerminateInterview(true)}
-        />
-      )}
     </div>
   );
 };

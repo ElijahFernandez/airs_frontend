@@ -1,12 +1,14 @@
 import React from "react";
 import Image from "next/image";
-
+import { useTheme } from "next-themes";
 const Congrats = () => {
+  const { theme } = useTheme();
+
   return (
     <div className="pb-36 pt-36 flex flex-col items-center justify-center">
       <div className="flex items-center justify-center m-5">
         <Image
-          src="/logos/checklogo.png"
+          src={theme === "dark" ? "/logos/checklogo.png" : "/logos/checklogob.png"}
           alt="AIRS Logo"
           width={150}
           height={100}

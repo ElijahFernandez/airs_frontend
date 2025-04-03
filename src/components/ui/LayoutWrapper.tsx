@@ -31,15 +31,12 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
   const shouldHideFooter = matchingRoutes.some(route => route.hideFooter);
 
   return (
-    <div className="relative flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen">
       {!shouldHideNavbar && <Navbar />}
-      <main className="max-w-7xl mx-auto w-full">
+      <main className="flex-grow max-w-7xl mx-auto w-full">
         {children}
       </main>
-      <div className="pt-12">
-        {!shouldHideFooter && <Footer />}
-      </div>
-      
+        {!shouldHideFooter && <Footer />}      
     </div>
   );
 };

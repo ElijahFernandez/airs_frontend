@@ -16,6 +16,7 @@ export default function Jobs() {
     console.log()
     const params = new URLSearchParams(window.location.search);
     const session = params.get('session');
+    console.log("Session ID:", session); // Log the session ID for debugging
     setSessionId(session);
   }, []);
 
