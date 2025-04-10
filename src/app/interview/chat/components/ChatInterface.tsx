@@ -367,7 +367,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   return (
     <div className="flex w-full h-full">
-      <div className="relative flex flex-col flex-1 max-w-7xl mx-auto bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-500">
+      <div className="relative flex flex-col flex-1 max-w-7xl mx-auto bg-backgroundgray rounded-xl shadow-xl overflow-hidden border border-gray-500">
         {/* Timer display */}
         {remainingTime !== null && (
           <div className="absolute top-4 right-4 bg-gray-700/90 backdrop-blur-sm text-white px-4 py-2 rounded-full flex items-center gap-2 z-10 shadow-md">
@@ -388,8 +388,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <div
                 className={`max-w-[85%] lg:max-w-[75%] p-4 rounded-2xl break-words transition-all duration-200 ${
                   msg.sender === "bot"
-                    ? "bg-gray-700/80 text-white hover:bg-gray-700"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    ? "bg-gray-700/80 text-foreground hover:bg-gray-700"
+                    : "bg-blue-600 text-foreground hover:bg-blue-700"
                 } ${
                   msg.sender === "bot" ? "rounded-tl-none" : "rounded-br-none"
                 } shadow-md`}
@@ -404,7 +404,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
   
         {/* Input area */}
-        <div className="p-4 bg-gray-900/50 border-t border-gray-700 backdrop-blur-sm">
+        <div className="p-4 bg-backgroundgray border-t border-gray-700 backdrop-blur-sm">
           <div className="flex gap-3">
             <input
               type="text"
@@ -425,7 +425,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 showToast("Cutting is not allowed.");
               }}
               disabled={isWaiting}
-              className="flex-1 px-5 py-3 border border-gray-700 rounded-xl bg-gray-800 text-gray-200 placeholder-gray-500 
+              className="flex-1 px-5 py-3 border border-gray-700 rounded-xl bg-background text-foreground placeholder-gray-500 
                         focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30
                         disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             />

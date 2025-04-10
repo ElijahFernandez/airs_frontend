@@ -316,7 +316,7 @@ const Review = () => {
 
       {/* Save and Exit Buttons */}
       <div className="flex gap-4 mx-auto mb-10 mt-7">
-        <button onClick={handleSave} disabled={isEmailSent} className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-white transition duration-300 ease-in-out transform hover:scale-105">
+        <button onClick={handleSave} disabled={isEmailSent} className="px-4 py-2 border border-relevance text-relevance rounded-lg hover:bg-relevance hover:text-foreground transition duration-300 ease-in-out transform hover:scale-105">
           Save
         </button>
         <button

@@ -2,7 +2,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ChatInterface from "@/app/interview/chat/components/ChatInterface";
-import GradientOverlay from "@/components/ui/GradientOverlay";
+// import GradientOverlay from "@/components/ui/GradientOverlay";
 import ExitConfirmationModal from "@/components/ui/modals/ExitConfirmationModal";
 import FullscreenPromptModal from "@/components/ui/modals/FullscreenPromptModal";
 import { AiOutlineHome } from "react-icons/ai"; // Import the Home icon
@@ -77,7 +77,7 @@ const Chat: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <GradientOverlay />
+      {/* <GradientOverlay /> */}
       {/* Home Icon */}
       <div>
         <button
